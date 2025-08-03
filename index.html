@@ -3,196 +3,144 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Enhanced Stock Tracker - Amsterdam Morning Alerts</title>
+    <title>Lupo - Enhanced Trading Platform</title>
     <link rel="stylesheet" href="style.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="manifest" href="#" id="pwa-manifest">
+    <meta name="theme-color" content="#B87333">
 </head>
-<body data-color-scheme="dark">
-    <div class="container">
-        <header class="header">
-            <h1>Enhanced Stock Tracker</h1>
-            <div class="header-controls">
-                <div class="search-container">
-                    <input type="text" id="stock-search" class="form-control search-input" placeholder="Search stocks...">
+<body>
+    <div class="app-container">
+        <!-- Header Section -->
+        <header class="app-header">
+            <div class="header-content">
+                <div class="brand-section">
+                    <h1 class="app-title">Lupo</h1>
+                    <p class="app-subtitle">Enhanced Trading Platform</p>
                 </div>
-                <div class="time-display">
-                    <div class="amsterdam-time">
-                        <span class="time-label">Amsterdam Time</span>
-                        <span id="amsterdam-time" class="time-value">--:--:--</span>
-                        <span id="amsterdam-date" class="date-value">---</span>
-                    </div>
+                <div class="time-display" id="amsterdam-time">
+                    <span class="time-label">Amsterdam</span>
+                    <span class="time-value" id="time-value">--:--</span>
                 </div>
             </div>
         </header>
 
-        <!-- Notification Permission Banner -->
-        <div id="notification-banner" class="notification-banner hidden">
-            <div class="banner-content">
-                <div class="banner-text">
-                    <h3>Enable Push Notifications</h3>
-                    <p>Get morning alerts for your tracked stocks in Amsterdam time</p>
+        <!-- Sentiment Physics Bar -->
+        <div class="sentiment-container">
+            <div class="sentiment-label">Market Sentiment</div>
+            <div class="sentiment-bar-container">
+                <div class="sentiment-bar" id="sentiment-bar">
+                    <div class="sentiment-fill" id="sentiment-fill"></div>
+                    <div class="sentiment-indicator" id="sentiment-indicator"></div>
                 </div>
-                <div class="banner-actions">
-                    <button id="enable-notifications" class="btn btn--primary">Enable</button>
-                    <button id="dismiss-banner" class="btn btn--outline">Dismiss</button>
-                </div>
+                <div class="sentiment-value" id="sentiment-value">--</div>
             </div>
         </div>
 
         <!-- Main Content -->
-        <div class="main-content">
-            <!-- Institutional Investment Tracker -->
-            <section class="institutional-section">
-                <h2>Institutional Investment Tracker</h2>
-                <div class="institutional-grid">
-                    <div class="institutional-card card">
-                        <div class="card__header">
-                            <h3>BlackRock Holdings</h3>
-                            <span class="fund-type">ETF Giant</span>
-                        </div>
-                        <div class="card__body">
-                            <div id="blackrock-holdings" class="holdings-list">
-                                <!-- BlackRock holdings will be inserted here -->
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="institutional-card card">
-                        <div class="card__header">
-                            <h3>Vanguard Holdings</h3>
-                            <span class="fund-type">Index Leader</span>
-                        </div>
-                        <div class="card__body">
-                            <div id="vanguard-holdings" class="holdings-list">
-                                <!-- Vanguard holdings will be inserted here -->
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="institutional-card card">
-                        <div class="card__header">
-                            <h3>Berkshire Hathaway</h3>
-                            <span class="fund-type">Value Investing</span>
-                        </div>
-                        <div class="card__body">
-                            <div id="berkshire-holdings" class="holdings-list">
-                                <!-- Berkshire holdings will be inserted here -->
-                            </div>
-                        </div>
-                    </div>
+        <main class="main-content">
+            <!-- Stock Categories -->
+            <section class="stock-section">
+                <h2 class="section-title">Stocks Under $4</h2>
+                <div class="stock-grid" id="under4-stocks">
+                    <!-- Stock cards will be dynamically generated -->
                 </div>
             </section>
 
-            <!-- Settings Panel -->
-            <section class="settings-panel card">
-                <div class="card__header">
-                    <h2>Notification Settings</h2>
-                </div>
-                <div class="card__body">
-                    <div class="settings-row">
-                        <div class="setting-item">
-                            <label for="notification-time" class="form-label">Morning Alert Time (Amsterdam)</label>
-                            <input type="time" id="notification-time" class="form-control" value="08:00">
-                        </div>
-                        <div class="setting-item">
-                            <span class="notification-status">
-                                Status: <span id="notification-status-text" class="status status--info">Not Enabled</span>
-                            </span>
-                        </div>
-                    </div>
-                    <div class="settings-actions">
-                        <button id="test-notification" class="btn btn--secondary">Test Notification</button>
-                        <button id="save-settings" class="btn btn--primary">Save Settings</button>
-                    </div>
+            <section class="stock-section">
+                <h2 class="section-title">High Potential Stocks</h2>
+                <div class="stock-grid" id="high-potential-stocks">
+                    <!-- Stock cards will be dynamically generated -->
                 </div>
             </section>
 
-            <!-- Stocks Under $1 -->
-            <section class="stocks-section">
-                <h2>Stocks Under $1 - Penny Stock Opportunities</h2>
-                <div class="stocks-grid" id="stocks-under-1">
-                    <!-- Stock cards will be inserted here by JavaScript -->
+            <!-- Watchlist Section -->
+            <section class="stock-section watchlist-section" id="watchlist-section" style="display: none;">
+                <h2 class="section-title">Watchlist</h2>
+                <div class="stock-grid" id="watchlist-stocks">
+                    <!-- Watchlist cards will be dynamically generated -->
                 </div>
             </section>
-
-            <!-- Stocks Under $4 -->
-            <section class="stocks-section">
-                <h2>Stocks Under $4 - Watchlist</h2>
-                <div class="stocks-grid" id="stocks-under-4">
-                    <!-- Stock cards will be inserted here by JavaScript -->
+            
+            <!-- Market Manipulation Detector -->
+            <section class="stock-section">
+                <h2 class="section-title">Market Manipulation Detector</h2>
+                <div class="manipulation-alerts" id="manipulation-alerts">
+                    <!-- Alerts will be populated dynamically -->
+                </div>
+                <div style="text-align: center; margin-top: 1rem;">
+                    <button class="btn btn--outline" id="clear-alerts">Clear History</button>
                 </div>
             </section>
+        </main>
 
-            <!-- High Potential Stocks Under $5 -->
-            <section class="stocks-section">
-                <h2>High Potential Stocks Under $5</h2>
-                <div class="stocks-grid" id="high-potential-stocks">
-                    <!-- High potential stock cards will be inserted here by JavaScript -->
-                </div>
-            </section>
+        <!-- Floating Action Button -->
+        <button class="fab" id="settings-fab">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="3"></circle>
+                <path d="M12 1v6m0 14v6m11-7h-6m-14 0h6m15.6-10.3l-1.4 1.4m-15.5 15.5l-1.4 1.4M20.5 3.5l-1.4 1.4M5.6 18.4l-1.4 1.4"></path>
+            </svg>
+        </button>
 
-            <!-- Notification History -->
-            <section class="notification-history card">
-                <div class="card__header">
-                    <h2>Notification History</h2>
-                    <button id="clear-history" class="btn btn--outline btn--sm">Clear History</button>
+        <!-- Settings Modal -->
+        <div class="modal hidden" id="settings-modal">
+            <div class="modal-backdrop" id="modal-backdrop"></div>
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Settings</h3>
+                    <button class="modal-close" id="modal-close">×</button>
                 </div>
-                <div class="card__body">
-                    <div id="notification-log" class="notification-log">
-                        <p class="empty-state">No notifications sent yet</p>
+                <div class="modal-body">
+                    <div class="setting-group">
+                        <label class="setting-label">
+                            <input type="checkbox" id="notifications-toggle"> 
+                            Enable Notifications
+                        </label>
+                    </div>
+                    <div class="setting-group">
+                        <label class="form-label">Notification Time</label>
+                        <input type="time" class="form-control" id="notification-time" value="08:00">
+                    </div>
+                    <div class="setting-group">
+                        <label class="form-label">Enabled Stocks</label>
+                        <div class="stock-toggles" id="stock-toggles">
+                            <!-- Stock toggles will be generated dynamically -->
+                        </div>
                     </div>
                 </div>
-            </section>
-        </div>
-    </div>
-
-    <!-- Stock Detail Modal -->
-    <div id="stock-modal" class="modal hidden">
-        <div class="modal-overlay"></div>
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 id="modal-stock-name">Stock Details</h2>
-                <button id="close-modal" class="modal-close">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="stock-detail-grid">
-                    <div class="detail-section">
-                        <h3>Company Information</h3>
-                        <div id="company-info" class="company-info">
-                            <!-- Company info will be inserted here -->
-                        </div>
-                    </div>
-                    
-                    <div class="detail-section">
-                        <h3>Price Chart</h3>
-                        <div class="chart-container" style="position: relative; height: 300px;">
-                            <canvas id="price-chart"></canvas>
-                        </div>
-                    </div>
-                    
-                    <div class="detail-section">
-                        <h3>Financial Metrics</h3>
-                        <div id="financial-metrics" class="metrics-grid">
-                            <!-- Financial metrics will be inserted here -->
-                        </div>
-                    </div>
-                    
-                    <div class="detail-section">
-                        <h3>Risk Assessment</h3>
-                        <div id="risk-assessment" class="risk-assessment">
-                            <!-- Risk assessment will be inserted here -->
-                        </div>
-                    </div>
-                    
-                    <div class="detail-section full-width">
-                        <h3>Recent News & Analysis</h3>
-                        <div id="news-analysis" class="news-list">
-                            <!-- News items will be inserted here -->
-                        </div>
-                    </div>
+                <div class="modal-footer">
+                    <button class="btn btn--outline" id="cancel-settings">Cancel</button>
+                    <button class="btn btn--primary" id="save-settings">Save Settings</button>
                 </div>
             </div>
         </div>
+
+        <!-- Stock Details Modal -->
+        <div class="modal hidden" id="stock-details-modal">
+            <div class="modal-backdrop"></div>
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="stock-details-title">Stock Details</h3>
+                    <button class="modal-close" id="stock-details-close">×</button>
+                </div>
+                <div class="modal-body" id="stock-details-content">
+                    <!-- Stock details will be populated dynamically -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Notification System -->
+        <div class="notification-container" id="notification-container">
+            <!-- Notifications will appear here -->
+        </div>
+
+        <!-- Development Roadmap Section -->
+        <section class="roadmap-section">
+            <h2 class="section-title">Development Roadmap</h2>
+            <div class="roadmap-card">
+                <img src="https://ppl-ai-code-interpreter-files.s3.amazonaws.com/web/direct-files/e990e34f9114de42614944d3fdbae370/e9388bd7-cd9f-4c41-aed6-706b57ab9ed8/2c643bb9.png" alt="Lupo Platform Development Roadmap" class="roadmap-image">
+                <p class="roadmap-description">Our 4-phase development plan focuses on delivering enhanced features, improved user experience, and cutting-edge trading tools.</p>
+            </div>
+        </section>
     </div>
 
     <script src="app.js"></script>
