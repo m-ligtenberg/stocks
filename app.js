@@ -3,6 +3,52 @@ class StockTracker {
     constructor() {
         // In-memory storage only (no localStorage to avoid sandbox issues)
         this.stocks = {
+            under1: [
+                {
+                    symbol: "SESN",
+                    name: "Sesen Bio",
+                    price: 0.83,
+                    basePrice: 0.83,
+                    priceRange: "$0.65 - $0.95",
+                    change: 0.05,
+                    changePercent: 6.41,
+                    sector: "Biotechnology",
+                    description: "Oncology-focused biotech with promising immunotherapy pipeline"
+                },
+                {
+                    symbol: "INUV",
+                    name: "Inuvo Inc",
+                    price: 0.92,
+                    basePrice: 0.92,
+                    priceRange: "$0.78 - $1.12",
+                    change: -0.04,
+                    changePercent: -4.17,
+                    sector: "Digital Marketing",
+                    description: "AI-driven digital marketing and advertising technology"
+                },
+                {
+                    symbol: "GEVO",
+                    name: "Gevo Inc",
+                    price: 0.67,
+                    basePrice: 0.67,
+                    priceRange: "$0.55 - $0.85",
+                    change: 0.03,
+                    changePercent: 4.69,
+                    sector: "Clean Energy",
+                    description: "Sustainable aviation fuel and renewable chemicals"
+                },
+                {
+                    symbol: "TNXP",
+                    name: "Tonix Pharmaceuticals",
+                    price: 0.78,
+                    basePrice: 0.78,
+                    priceRange: "$0.60 - $0.95",
+                    change: -0.02,
+                    changePercent: -2.50,
+                    sector: "Pharmaceuticals",
+                    description: "Central nervous system disorders and infectious diseases"
+                }
+            ],
             under4: [
                 {
                     symbol: "TTI",
@@ -91,7 +137,9 @@ class StockTracker {
         this.settings = {
             notificationTime: '08:00',
             notificationsEnabled: false,
+            theme: 'light',
             stocksEnabled: {
+                SESN: true, INUV: true, GEVO: true, TNXP: true,
                 TTI: true, SB: true, TUYA: true, NOK: true, FSI: true, DSGN: true, SRNE: true
             }
         };
@@ -107,6 +155,7 @@ class StockTracker {
     init() {
         console.log('Initializing Stock Tracker...');
         this.setupEventListeners();
+        this.applyTheme();
         this.renderStocks();
         this.updateAmsterdamTime();
         this.checkNotificationPermission();
@@ -148,6 +197,13 @@ class StockTracker {
 
         document.getElementById('clear-history').addEventListener('click', () => {
             this.clearNotificationHistory();
+        });
+
+        // Theme selector
+        document.getElementById('theme-select').addEventListener('change', (e) => {
+            this.settings.theme = e.target.value;
+            this.applyTheme();
+            this.showMessage(`Theme changed to ${e.target.value}`, 'info');
         });
 
         // Stock toggles (delegated event handling)
@@ -358,7 +414,7 @@ class StockTracker {
     }
 
     getEnabledStocks() {
-        const allStocks = [...this.stocks.under4, ...this.stocks.highPotential];
+        const allStocks = [...this.stocks.under1, ...this.stocks.under4, ...this.stocks.highPotential];
         return allStocks.filter(stock => this.settings.stocksEnabled[stock.symbol]);
     }
 
@@ -411,7 +467,14 @@ class StockTracker {
         this.showMessage('Notification history cleared', 'info');
     }
 
+    applyTheme() {
+        const themeSelect = document.getElementById('theme-select');
+        themeSelect.value = this.settings.theme;
+        document.documentElement.setAttribute('data-color-scheme', this.settings.theme);
+    }
+
     renderStocks() {
+        this.renderStockGrid('stocks-under-1', this.stocks.under1, false);
         this.renderStockGrid('stocks-under-4', this.stocks.under4, false);
         this.renderStockGrid('high-potential-stocks', this.stocks.highPotential, true);
     }
@@ -429,9 +492,14 @@ class StockTracker {
         const isEnabled = this.settings.stocksEnabled[stock.symbol];
         const changeClass = stock.change >= 0 ? 'positive' : 'negative';
         const changeSign = stock.change >= 0 ? '+' : '';
+        const isUltraLow = stock.price < 1;
+        
+        let cardClass = 'stock-card';
+        if (isHighPotential) cardClass += ' stock-card--high-potential';
+        if (isUltraLow) cardClass += ' stock-card--ultra-low';
         
         return `
-            <div class="stock-card ${isHighPotential ? 'stock-card--high-potential' : ''}">
+            <div class="${cardClass}">
                 <div class="stock-header">
                     <div class="stock-info">
                         <h3 class="stock-symbol">${stock.symbol}</h3>
@@ -479,7 +547,7 @@ class StockTracker {
     }
 
     updatePrices() {
-        const allStocks = [...this.stocks.under4, ...this.stocks.highPotential];
+        const allStocks = [...this.stocks.under1, ...this.stocks.under4, ...this.stocks.highPotential];
         
         allStocks.forEach(stock => {
             const oldPrice = stock.price;

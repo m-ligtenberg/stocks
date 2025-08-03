@@ -10,11 +10,21 @@
     <div class="container">
         <header class="header">
             <h1>Stock Tracker</h1>
-            <div class="time-display">
-                <div class="amsterdam-time">
-                    <span class="time-label">Amsterdam Time</span>
-                    <span id="amsterdam-time" class="time-value">--:--:--</span>
-                    <span id="amsterdam-date" class="date-value">---</span>
+            <div class="header-controls">
+                <div class="theme-selector">
+                    <label for="theme-select" class="form-label">Theme</label>
+                    <select id="theme-select" class="form-control theme-select">
+                        <option value="light">Light</option>
+                        <option value="dark">Dark</option>
+                        <option value="yellow">Yellow</option>
+                    </select>
+                </div>
+                <div class="time-display">
+                    <div class="amsterdam-time">
+                        <span class="time-label">Amsterdam Time</span>
+                        <span id="amsterdam-time" class="time-value">--:--:--</span>
+                        <span id="amsterdam-date" class="date-value">---</span>
+                    </div>
                 </div>
             </div>
         </header>
@@ -56,6 +66,14 @@
                         <button id="test-notification" class="btn btn--secondary">Test Notification</button>
                         <button id="save-settings" class="btn btn--primary">Save Settings</button>
                     </div>
+                </div>
+            </section>
+
+            <!-- Stocks Under $1 -->
+            <section class="stocks-section">
+                <h2>Stocks Under $1 - Ultra Low Price</h2>
+                <div class="stocks-grid" id="stocks-under-1">
+                    <!-- Stock cards will be inserted here by JavaScript -->
                 </div>
             </section>
 
