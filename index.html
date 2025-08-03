@@ -3,145 +3,449 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lupo - Enhanced Trading Platform</title>
+    <title>Lupo - Transparent. Independent. Retail-Focused.</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="manifest" href="#" id="pwa-manifest">
-    <meta name="theme-color" content="#B87333">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <div class="app-container">
-        <!-- Header Section -->
-        <header class="app-header">
+    <!-- Main App (Hidden by default) -->
+    <div id="main-app" class="hidden">
+        <!-- Professional Header -->
+        <header class="main-header">
+        <div class="container">
             <div class="header-content">
                 <div class="brand-section">
-                    <h1 class="app-title">Lupo</h1>
-                    <p class="app-subtitle">Enhanced Trading Platform</p>
+                    <h1 class="brand-title">Lupo</h1>
+                    <p class="brand-tagline">Transparent. Independent. Retail-Focused.</p>
                 </div>
-                <div class="time-display" id="amsterdam-time">
-                    <span class="time-label">Amsterdam</span>
-                    <span class="time-value" id="time-value">--:--</span>
+                <div class="header-stats">
+                    <div class="stat-item">
+                        <span class="stat-label">Community Members</span>
+                        <span class="stat-value" id="community-members">45,289</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Amsterdam Time</span>
+                        <span id="amsterdam-time" class="stat-value">--:--:--</span>
+                    </div>
                 </div>
-            </div>
-        </header>
-
-        <!-- Sentiment Physics Bar -->
-        <div class="sentiment-container">
-            <div class="sentiment-label">Market Sentiment</div>
-            <div class="sentiment-bar-container">
-                <div class="sentiment-bar" id="sentiment-bar">
-                    <div class="sentiment-fill" id="sentiment-fill"></div>
-                    <div class="sentiment-indicator" id="sentiment-indicator"></div>
-                </div>
-                <div class="sentiment-value" id="sentiment-value">--</div>
             </div>
         </div>
+    </header>
 
-        <!-- Main Content -->
-        <main class="main-content">
-            <!-- Stock Categories -->
-            <section class="stock-section">
-                <h2 class="section-title">Stocks Under $4</h2>
-                <div class="stock-grid" id="under4-stocks">
-                    <!-- Stock cards will be dynamically generated -->
-                </div>
-            </section>
-
-            <section class="stock-section">
-                <h2 class="section-title">High Potential Stocks</h2>
-                <div class="stock-grid" id="high-potential-stocks">
-                    <!-- Stock cards will be dynamically generated -->
-                </div>
-            </section>
-
-            <!-- Watchlist Section -->
-            <section class="stock-section watchlist-section" id="watchlist-section" style="display: none;">
-                <h2 class="section-title">Watchlist</h2>
-                <div class="stock-grid" id="watchlist-stocks">
-                    <!-- Watchlist cards will be dynamically generated -->
-                </div>
-            </section>
-            
-            <!-- Market Manipulation Detector -->
-            <section class="stock-section">
-                <h2 class="section-title">Market Manipulation Detector</h2>
-                <div class="manipulation-alerts" id="manipulation-alerts">
-                    <!-- Alerts will be populated dynamically -->
-                </div>
-                <div style="text-align: center; margin-top: 1rem;">
-                    <button class="btn btn--outline" id="clear-alerts">Clear History</button>
-                </div>
-            </section>
-        </main>
-
-        <!-- Floating Action Button -->
-        <button class="fab" id="settings-fab">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="12" cy="12" r="3"></circle>
-                <path d="M12 1v6m0 14v6m11-7h-6m-14 0h6m15.6-10.3l-1.4 1.4m-15.5 15.5l-1.4 1.4M20.5 3.5l-1.4 1.4M5.6 18.4l-1.4 1.4"></path>
-            </svg>
-        </button>
-
-        <!-- Settings Modal -->
-        <div class="modal hidden" id="settings-modal">
-            <div class="modal-backdrop" id="modal-backdrop"></div>
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3>Settings</h3>
-                    <button class="modal-close" id="modal-close">×</button>
-                </div>
-                <div class="modal-body">
-                    <div class="setting-group">
-                        <label class="setting-label">
-                            <input type="checkbox" id="notifications-toggle"> 
-                            Enable Notifications
-                        </label>
+    <!-- Market Intelligence Dashboard -->
+    <section class="intelligence-dashboard">
+        <div class="container">
+            <h2 class="section-title">Market Intelligence</h2>
+            <div class="intelligence-grid">
+                <div class="intelligence-card retail-sentiment">
+                    <div class="card-header">
+                        <h3>Retail Sentiment</h3>
+                        <span class="sentiment-badge positive">Bullish</span>
                     </div>
-                    <div class="setting-group">
-                        <label class="form-label">Notification Time</label>
-                        <input type="time" class="form-control" id="notification-time" value="08:00">
+                    <div class="sentiment-meter">
+                        <div class="meter-bar">
+                            <div class="meter-fill retail-fill" style="width: 68%"></div>
+                        </div>
+                        <span class="sentiment-score">68% Optimistic</span>
                     </div>
-                    <div class="setting-group">
-                        <label class="form-label">Enabled Stocks</label>
-                        <div class="stock-toggles" id="stock-toggles">
-                            <!-- Stock toggles will be generated dynamically -->
+                    <div class="intelligence-stats">
+                        <div class="stat">
+                            <span class="stat-number">45,289</span>
+                            <span class="stat-text">Active Members</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-number">1,247</span>
+                            <span class="stat-text">Discussions</span>
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button class="btn btn--outline" id="cancel-settings">Cancel</button>
-                    <button class="btn btn--primary" id="save-settings">Save Settings</button>
+
+                <div class="intelligence-card institutional-sentiment">
+                    <div class="card-header">
+                        <h3>Institutional Sentiment</h3>
+                        <span class="sentiment-badge neutral">Cautious</span>
+                    </div>
+                    <div class="sentiment-meter">
+                        <div class="meter-bar">
+                            <div class="meter-fill institutional-fill" style="width: 42%"></div>
+                        </div>
+                        <span class="sentiment-score">42% Conservative</span>
+                    </div>
+                    <div class="intelligence-stats">
+                        <div class="stat">
+                            <span class="stat-number">23</span>
+                            <span class="stat-text">Opportunities</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-number">156</span>
+                            <span class="stat-text">Alerts Active</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
+    </section>
 
-        <!-- Stock Details Modal -->
-        <div class="modal hidden" id="stock-details-modal">
-            <div class="modal-backdrop"></div>
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3 id="stock-details-title">Stock Details</h3>
-                    <button class="modal-close" id="stock-details-close">×</button>
+    <!-- Navigation -->
+    <nav class="main-nav">
+        <div class="container">
+            <div class="nav-tabs">
+                <button class="nav-tab active" data-tab="retail-opportunities">Small Investor Opportunities</button>
+                <button class="nav-tab" data-tab="my-watchlist">My Watchlist</button>
+                <button class="nav-tab" data-tab="my-portfolio">My Portfolio</button>
+                <button class="nav-tab" data-tab="institutional-transparency">Institutional Transparency</button>
+                <button class="nav-tab" data-tab="market-alerts">Fair Market Alerts</button>
+                <button class="nav-tab" data-tab="community-insights">Community Insights</button>
+                <button class="nav-tab" data-tab="education-hub">Education Hub</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            
+            <!-- Retail Opportunities Tab -->
+            <section id="retail-opportunities" class="content-tab active">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                    <h2 class="tab-title" style="margin: 0;">Small Investor Opportunities</h2>
+                    <button id="refresh-data" class="btn btn-secondary" style="padding: 8px 16px;">
+                        🔄 Refresh Data
+                    </button>
                 </div>
-                <div class="modal-body" id="stock-details-content">
-                    <!-- Stock details will be populated dynamically -->
+                
+                <div class="opportunities-grid">
+                    <div class="opportunity-category">
+                        <h3 class="category-title">Value Opportunities Under $1</h3>
+                        <div class="stocks-grid" id="under-1-stocks">
+                            <!-- Under $1 stocks will be rendered here -->
+                        </div>
+                    </div>
+                    
+                    <div class="opportunity-category">
+                        <h3 class="category-title">Growth Stocks Under $4</h3>
+                        <div class="stocks-grid" id="under-4-stocks">
+                            <!-- Under $4 stocks will be rendered here -->
+                        </div>
+                    </div>
+
+                    <div class="opportunity-category">
+                        <h3 class="category-title">High-Potential Under $5</h3>
+                        <div class="stocks-grid" id="under-5-stocks">
+                            <!-- Under $5 stocks will be rendered here -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- My Watchlist Tab -->
+            <section id="my-watchlist" class="content-tab">
+                <h2 class="tab-title">My Personal Watchlist</h2>
+                
+                <!-- Stock Search -->
+                <div class="watchlist-search" style="background: var(--color-professional-surface); border-radius: var(--radius-lg); padding: var(--space-24); margin-bottom: var(--space-24); border: 1px solid rgba(245, 158, 11, 0.2);">
+                    <h3 style="margin-bottom: var(--space-16); color: var(--color-professional-text);">Add Stock to Watchlist</h3>
+                    <div style="display: flex; gap: var(--space-12); align-items: center;">
+                        <input 
+                            type="text" 
+                            id="stock-search" 
+                            placeholder="Enter stock symbol (e.g., AAPL, TSLA, NOK)" 
+                            class="form-control" 
+                            style="flex: 1; background: var(--color-professional-dark); border: 1px solid rgba(245, 158, 11, 0.3); color: var(--color-professional-text);"
+                        >
+                        <button id="add-to-watchlist" class="btn btn-primary">
+                            📊 Add Stock
+                        </button>
+                    </div>
+                    <div id="search-suggestions" class="search-suggestions" style="margin-top: var(--space-12);"></div>
+                </div>
+
+                <!-- Watchlist Grid -->
+                <div class="watchlist-container">
+                    <div id="watchlist-stocks" class="stocks-grid">
+                        <!-- User's watchlist stocks will be rendered here -->
+                    </div>
+                    <div id="empty-watchlist" class="empty-state" style="text-align: center; padding: var(--space-32); color: var(--color-professional-text-secondary);">
+                        <div style="font-size: 48px; margin-bottom: var(--space-16);">📊</div>
+                        <h3 style="margin-bottom: var(--space-8);">Your Watchlist is Empty</h3>
+                        <p>Add stocks you want to track by searching above. Start with popular symbols like AAPL, TSLA, or NOK.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- My Portfolio Tab -->
+            <section id="my-portfolio" class="content-tab">
+                <h2 class="tab-title">My Trading Portfolio</h2>
+                
+                <!-- Portfolio Summary -->
+                <div class="portfolio-summary" style="background: var(--color-professional-surface); border-radius: var(--radius-lg); padding: var(--space-24); margin-bottom: var(--space-24); border: 1px solid rgba(245, 158, 11, 0.2);">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-20);">
+                        <div class="portfolio-stat">
+                            <div class="stat-label" style="font-size: var(--font-size-sm); color: var(--color-professional-text-secondary); margin-bottom: var(--space-4);">Portfolio Value</div>
+                            <div id="portfolio-value" class="stat-value" style="font-size: var(--font-size-3xl); font-weight: var(--font-weight-bold); color: var(--color-professional-primary); font-family: var(--font-family-mono);">$10,000.00</div>
+                        </div>
+                        <div class="portfolio-stat">
+                            <div class="stat-label" style="font-size: var(--font-size-sm); color: var(--color-professional-text-secondary); margin-bottom: var(--space-4);">Available Cash</div>
+                            <div id="available-cash" class="stat-value" style="font-size: var(--font-size-3xl); font-weight: var(--font-weight-bold); color: var(--color-retail-positive); font-family: var(--font-family-mono);">$10,000.00</div>
+                        </div>
+                        <div class="portfolio-stat">
+                            <div class="stat-label" style="font-size: var(--font-size-sm); color: var(--color-professional-text-secondary); margin-bottom: var(--space-4);">Total P&L</div>
+                            <div id="total-pnl" class="stat-value" style="font-size: var(--font-size-3xl); font-weight: var(--font-weight-bold); color: var(--color-professional-text-secondary); font-family: var(--font-family-mono);">$0.00</div>
+                        </div>
+                        <div class="portfolio-stat">
+                            <div class="stat-label" style="font-size: var(--font-size-sm); color: var(--color-professional-text-secondary); margin-bottom: var(--space-4);">Positions</div>
+                            <div id="total-positions" class="stat-value" style="font-size: var(--font-size-3xl); font-weight: var(--font-weight-bold); color: var(--color-professional-text); font-family: var(--font-family-mono);">0</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Holdings Section -->
+                <div class="portfolio-holdings">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-20);">
+                        <h3 style="margin: 0; color: var(--color-professional-text);">My Holdings</h3>
+                        <button id="reset-portfolio" class="btn btn-outline" style="padding: 8px 16px; font-size: var(--font-size-sm);">
+                        🔄 Reset Portfolio
+                        </button>
+                    </div>
+                    
+                    <div id="portfolio-holdings" class="stocks-grid">
+                        <!-- User's holdings will be rendered here -->
+                    </div>
+                    
+                    <div id="empty-portfolio" class="empty-state" style="text-align: center; padding: var(--space-32); color: var(--color-professional-text-secondary);">
+                        <div style="font-size: 48px; margin-bottom: var(--space-16);">💼</div>
+                        <h3 style="margin-bottom: var(--space-8);">No Holdings Yet</h3>
+                        <p>Start trading by buying stocks from your watchlist or the opportunities above. You have $10,000 in simulated cash to practice with!</p>
+                    </div>
+                </div>
+
+                <!-- Transaction History -->
+                <div class="transaction-history" style="margin-top: var(--space-32);">
+                    <h3 style="margin-bottom: var(--space-20); color: var(--color-professional-text);">Recent Transactions</h3>
+                    <div id="transaction-list" style="background: var(--color-professional-surface); border-radius: var(--radius-lg); border: 1px solid rgba(245, 158, 11, 0.1);">
+                        <div id="empty-transactions" style="padding: var(--space-24); text-align: center; color: var(--color-professional-text-secondary);">
+                            <div style="font-size: 24px; margin-bottom: var(--space-8);">📈</div>
+                            <p>No transactions yet. Start trading to see your history here.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Institutional Transparency Tab -->
+            <section id="institutional-transparency" class="content-tab">
+                <h2 class="tab-title">Institutional Transparency</h2>
+                <div class="transparency-grid">
+                    <div class="institution-card">
+                        <div class="institution-header">
+                            <h3>BlackRock Holdings</h3>
+                            <span class="market-influence high">High Market Influence</span>
+                        </div>
+                        <div class="holdings-list" id="blackrock-holdings">
+                            <!-- BlackRock holdings will be rendered here -->
+                        </div>
+                    </div>
+                    
+                    <div class="institution-card">
+                        <div class="institution-header">
+                            <h3>Vanguard Holdings</h3>
+                            <span class="market-influence high">High Market Influence</span>
+                        </div>
+                        <div class="holdings-list" id="vanguard-holdings">
+                            <!-- Vanguard holdings will be rendered here -->
+                        </div>
+                    </div>
+
+                    <div class="institution-card">
+                        <div class="institution-header">
+                            <h3>Berkshire Hathaway</h3>
+                            <span class="market-influence medium">Strategic Positions</span>
+                        </div>
+                        <div class="holdings-list" id="berkshire-holdings">
+                            <!-- Berkshire holdings will be rendered here -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Market Alerts Tab -->
+            <section id="market-alerts" class="content-tab">
+                <h2 class="tab-title">Fair Market Alerts</h2>
+                <div class="alerts-container" id="market-alerts-list">
+                    <!-- Market alerts will be rendered here -->
+                </div>
+            </section>
+
+            <!-- Community Insights Tab -->
+            <section id="community-insights" class="content-tab">
+                <h2 class="tab-title">Community Insights</h2>
+                <div class="insights-container" id="community-insights-list">
+                    <!-- Community insights will be rendered here -->
+                </div>
+            </section>
+
+            <!-- Education Hub Tab -->
+            <section id="education-hub" class="content-tab">
+                <h2 class="tab-title">Investor Education Hub</h2>
+                <div class="education-grid">
+                    <div class="education-card">
+                        <h3>Market Structure Explained</h3>
+                        <p>Understanding how institutional trading affects retail investors and market dynamics.</p>
+                        <button class="btn btn-outline">Learn More</button>
+                    </div>
+                    <div class="education-card">
+                        <h3>Investment Strategies for Small Investors</h3>
+                        <p>Proven strategies for building wealth with limited capital and competing with institutions.</p>
+                        <button class="btn btn-outline">Learn More</button>
+                    </div>
+                    <div class="education-card">
+                        <h3>Risk Management Essentials</h3>
+                        <p>Tools and techniques to protect your investments and manage risk effectively.</p>
+                        <button class="btn btn-outline">Learn More</button>
+                    </div>
+                    <div class="education-card">
+                        <h3>Understanding Dark Pools</h3>
+                        <p>How institutional dark pool trading works and its impact on price discovery.</p>
+                        <button class="btn btn-outline">Learn More</button>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Stock Analysis Modal -->
+    <div id="stock-modal" class="modal hidden">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-title">Investment Analysis</h2>
+                <button id="close-modal" class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-tabs">
+                    <button class="modal-tab active" data-modal-tab="investment-analysis">Investment Analysis</button>
+                    <button class="modal-tab" data-modal-tab="market-structure">Market Structure</button>
+                    <button class="modal-tab" data-modal-tab="community-sentiment">Community Sentiment</button>
+                </div>
+                
+                <div class="modal-content-area">
+                    <div id="investment-analysis" class="modal-tab-content active">
+                        <div id="analysis-metrics" class="analysis-metrics">
+                            <!-- Investment analysis will be rendered here -->
+                        </div>
+                        <div class="chart-container" style="position: relative; height: 300px;">
+                            <canvas id="analysis-chart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div id="market-structure" class="modal-tab-content">
+                        <div id="structure-info">
+                            <!-- Market structure will be rendered here -->
+                        </div>
+                    </div>
+                    
+                    <div id="community-sentiment" class="modal-tab-content">
+                        <div id="sentiment-analysis">
+                            <!-- Community sentiment will be rendered here -->
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="modal-actions">
+                    <button class="btn btn-primary" id="buy-stock">💰 Buy Shares</button>
+                    <button class="btn btn-secondary" id="sell-stock">💸 Sell Shares</button>
+                    <button class="btn btn-outline" id="add-to-watchlist-modal">📊 Add to Watchlist</button>
+                    <button class="btn btn-outline" id="set-alert-modal">🔔 Set Alert</button>
                 </div>
             </div>
         </div>
-
-        <!-- Notification System -->
-        <div class="notification-container" id="notification-container">
-            <!-- Notifications will appear here -->
-        </div>
-
-        <!-- Development Roadmap Section -->
-        <section class="roadmap-section">
-            <h2 class="section-title">Development Roadmap</h2>
-            <div class="roadmap-card">
-                <img src="https://ppl-ai-code-interpreter-files.s3.amazonaws.com/web/direct-files/e990e34f9114de42614944d3fdbae370/e9388bd7-cd9f-4c41-aed6-706b57ab9ed8/2c643bb9.png" alt="Lupo Platform Development Roadmap" class="roadmap-image">
-                <p class="roadmap-description">Our 4-phase development plan focuses on delivering enhanced features, improved user experience, and cutting-edge trading tools.</p>
-            </div>
-        </section>
     </div>
+
+    <!-- Notification Toast -->
+    <div id="notification-toast" class="notification-toast hidden">
+        <div class="toast-content">
+            <span class="toast-icon">📊</span>
+            <div class="toast-text">
+                <div class="toast-title">Market Update</div>
+                <div class="toast-message">New opportunity identified!</div>
+            </div>
+        </div>
+    </div>
+    </div> <!-- End of main-app -->
+
+    <!-- Login Landing Page -->
+    <div id="login-page" class="login-container">
+        <div class="login-background"></div>
+        <div class="login-content">
+            <div class="login-card">
+                <div class="login-header">
+                    <h1 class="login-brand">Lupo</h1>
+                    <p class="login-tagline">Transparent. Independent. Retail-Focused.</p>
+                    <p class="login-subtitle">Empowering retail investors through market transparency and education</p>
+                </div>
+
+                <div class="login-form">
+                    <div class="form-group">
+                        <label for="login-email" class="form-label">Email Address</label>
+                        <input type="email" id="login-email" class="form-control" placeholder="Enter your email" value="demo@lupo.com">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="login-password" class="form-label">Password</label>
+                        <input type="password" id="login-password" class="form-control" placeholder="Enter your password" value="demo123">
+                    </div>
+
+                    <button id="login-button" class="btn btn-primary login-btn">
+                        🚀 Enter Trading Platform
+                    </button>
+
+                    <div class="login-demo-info">
+                        <p style="margin: 16px 0 8px 0; font-size: 14px; color: var(--color-professional-text-secondary);">
+                            📊 Demo Credentials (auto-filled):
+                        </p>
+                        <p style="margin: 0; font-size: 12px; color: var(--color-professional-text-secondary); font-family: var(--font-family-mono);">
+                            Email: demo@lupo.com<br>
+                            Password: demo123
+                        </p>
+                    </div>
+                </div>
+
+                <div class="login-features">
+                    <h3>Platform Features</h3>
+                    <div class="features-grid">
+                        <div class="feature-item">
+                            <div class="feature-icon">📊</div>
+                            <div class="feature-text">
+                                <strong>Live Stock Data</strong>
+                                <p>Real-time prices via Alpha Vantage API</p>
+                            </div>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon">👀</div>
+                            <div class="feature-text">
+                                <strong>Personal Watchlist</strong>
+                                <p>Track your favorite stocks</p>
+                            </div>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon">💼</div>
+                            <div class="feature-text">
+                                <strong>Portfolio Simulation</strong>
+                                <p>Practice trading with $10,000 virtual cash</p>
+                            </div>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon">🏛️</div>
+                            <div class="feature-text">
+                                <strong>Wall Street Transparency</strong>
+                                <p>See institutional holdings & market structure</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
     <script src="app.js"></script>
 </body>
