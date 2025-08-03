@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Tracker - Amsterdam Morning Alerts</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>Stock Tracker</h1>
+            <div class="time-display">
+                <div class="amsterdam-time">
+                    <span class="time-label">Amsterdam Time</span>
+                    <span id="amsterdam-time" class="time-value">--:--:--</span>
+                    <span id="amsterdam-date" class="date-value">---</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Notification Permission Banner -->
+        <div id="notification-banner" class="notification-banner hidden">
+            <div class="banner-content">
+                <div class="banner-text">
+                    <h3>Enable Push Notifications</h3>
+                    <p>Get morning alerts for your tracked stocks in Amsterdam time</p>
+                </div>
+                <div class="banner-actions">
+                    <button id="enable-notifications" class="btn btn--primary">Enable</button>
+                    <button id="dismiss-banner" class="btn btn--outline">Dismiss</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Settings Panel -->
+            <section class="settings-panel card">
+                <div class="card__header">
+                    <h2>Notification Settings</h2>
+                </div>
+                <div class="card__body">
+                    <div class="settings-row">
+                        <div class="setting-item">
+                            <label for="notification-time" class="form-label">Morning Alert Time (Amsterdam)</label>
+                            <input type="time" id="notification-time" class="form-control" value="08:00">
+                        </div>
+                        <div class="setting-item">
+                            <span class="notification-status">
+                                Status: <span id="notification-status-text" class="status status--info">Not Enabled</span>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="settings-actions">
+                        <button id="test-notification" class="btn btn--secondary">Test Notification</button>
+                        <button id="save-settings" class="btn btn--primary">Save Settings</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Stocks Under $4 -->
+            <section class="stocks-section">
+                <h2>Stocks Under $4 - Watchlist</h2>
+                <div class="stocks-grid" id="stocks-under-4">
+                    <!-- Stock cards will be inserted here by JavaScript -->
+                </div>
+            </section>
+
+            <!-- High Potential Stocks Under $5 -->
+            <section class="stocks-section">
+                <h2>High Potential Stocks Under $5</h2>
+                <div class="stocks-grid" id="high-potential-stocks">
+                    <!-- High potential stock cards will be inserted here by JavaScript -->
+                </div>
+            </section>
+
+            <!-- Notification History -->
+            <section class="notification-history card">
+                <div class="card__header">
+                    <h2>Notification History</h2>
+                    <button id="clear-history" class="btn btn--outline btn--sm">Clear History</button>
+                </div>
+                <div class="card__body">
+                    <div id="notification-log" class="notification-log">
+                        <p class="empty-state">No notifications sent yet</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
