@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lupo - Enhanced Trading Platform</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="#" id="pwa-manifest">
+    <meta name="theme-color" content="#B87333">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header Section -->
+        <header class="app-header">
+            <div class="header-content">
+                <div class="brand-section">
+                    <h1 class="app-title">Lupo</h1>
+                    <p class="app-subtitle">Enhanced Trading Platform</p>
+                </div>
+                <div class="time-display" id="amsterdam-time">
+                    <span class="time-label">Amsterdam</span>
+                    <span class="time-value" id="time-value">--:--</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Sentiment Physics Bar -->
+        <div class="sentiment-container">
+            <div class="sentiment-label">Market Sentiment</div>
+            <div class="sentiment-bar-container">
+                <div class="sentiment-bar" id="sentiment-bar">
+                    <div class="sentiment-fill" id="sentiment-fill"></div>
+                    <div class="sentiment-indicator" id="sentiment-indicator"></div>
+                </div>
+                <div class="sentiment-value" id="sentiment-value">--</div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Stock Categories -->
+            <section class="stock-section">
+                <h2 class="section-title">Stocks Under $4</h2>
+                <div class="stock-grid" id="under4-stocks">
+                    <!-- Stock cards will be dynamically generated -->
+                </div>
+            </section>
+
+            <section class="stock-section">
+                <h2 class="section-title">High Potential Stocks</h2>
+                <div class="stock-grid" id="high-potential-stocks">
+                    <!-- Stock cards will be dynamically generated -->
+                </div>
+            </section>
+
+            <!-- Watchlist Section -->
+            <section class="stock-section watchlist-section" id="watchlist-section" style="display: none;">
+                <h2 class="section-title">Watchlist</h2>
+                <div class="stock-grid" id="watchlist-stocks">
+                    <!-- Watchlist cards will be dynamically generated -->
+                </div>
+            </section>
+            
+            <!-- Market Manipulation Detector -->
+            <section class="stock-section">
+                <h2 class="section-title">Market Manipulation Detector</h2>
+                <div class="manipulation-alerts" id="manipulation-alerts">
+                    <!-- Alerts will be populated dynamically -->
+                </div>
+                <div style="text-align: center; margin-top: 1rem;">
+                    <button class="btn btn--outline" id="clear-alerts">Clear History</button>
+                </div>
+            </section>
+        </main>
+
+        <!-- Floating Action Button -->
+        <button class="fab" id="settings-fab">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="3"></circle>
+                <path d="M12 1v6m0 14v6m11-7h-6m-14 0h6m15.6-10.3l-1.4 1.4m-15.5 15.5l-1.4 1.4M20.5 3.5l-1.4 1.4M5.6 18.4l-1.4 1.4"></path>
+            </svg>
+        </button>
+
+        <!-- Settings Modal -->
+        <div class="modal hidden" id="settings-modal">
+            <div class="modal-backdrop" id="modal-backdrop"></div>
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Settings</h3>
+                    <button class="modal-close" id="modal-close">×</button>
+                </div>
+                <div class="modal-body">
+                    <div class="setting-group">
+                        <label class="setting-label">
+                            <input type="checkbox" id="notifications-toggle"> 
+                            Enable Notifications
+                        </label>
+                    </div>
+                    <div class="setting-group">
+                        <label class="form-label">Notification Time</label>
+                        <input type="time" class="form-control" id="notification-time" value="08:00">
+                    </div>
+                    <div class="setting-group">
+                        <label class="form-label">Enabled Stocks</label>
+                        <div class="stock-toggles" id="stock-toggles">
+                            <!-- Stock toggles will be generated dynamically -->
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn--outline" id="cancel-settings">Cancel</button>
+                    <button class="btn btn--primary" id="save-settings">Save Settings</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stock Details Modal -->
+        <div class="modal hidden" id="stock-details-modal">
+            <div class="modal-backdrop"></div>
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="stock-details-title">Stock Details</h3>
+                    <button class="modal-close" id="stock-details-close">×</button>
+                </div>
+                <div class="modal-body" id="stock-details-content">
+                    <!-- Stock details will be populated dynamically -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Notification System -->
+        <div class="notification-container" id="notification-container">
+            <!-- Notifications will appear here -->
+        </div>
+
+        <!-- Development Roadmap Section -->
+        <section class="roadmap-section">
+            <h2 class="section-title">Development Roadmap</h2>
+            <div class="roadmap-card">
+                <img src="https://ppl-ai-code-interpreter-files.s3.amazonaws.com/web/direct-files/e990e34f9114de42614944d3fdbae370/e9388bd7-cd9f-4c41-aed6-706b57ab9ed8/2c643bb9.png" alt="Lupo Platform Development Roadmap" class="roadmap-image">
+                <p class="roadmap-description">Our 4-phase development plan focuses on delivering enhanced features, improved user experience, and cutting-edge trading tools.</p>
+            </div>
+        </section>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
