@@ -1,11 +1,23 @@
 /**
  * Password Reset Component
- * Handles forgot password and password reset functionality
+ * Handles forgot password and password reset functionality with standardized services
  */
 class PasswordReset {
-    constructor(authService, notificationService) {
+    constructor(
+        authService = window.lupoAuth,
+        notificationService = window.lupoNotifications,
+        validationUtils = window.ValidationUtils,
+        config = window.lupoConfig
+    ) {
         this.authService = authService;
         this.notificationService = notificationService;
+        this.validationUtils = validationUtils;
+        this.config = config;
+        
+        this.resetAttempts = 0;
+        this.maxResetAttempts = this.config.get('auth.maxResetAttempts', 3);
+        this.rateLimitDelay = this.config.get('auth.rateLimitDelay', 60000); // 1 minute
+        
         this.init();
     }
 
@@ -139,8 +151,19 @@ class PasswordReset {
         const email = document.getElementById('reset-email').value;
         const submitBtn = document.querySelector('#password-reset-form .btn-primary');
 
-        if (!email) {
-            this.notificationService.warning('Invalid Input', 'Please enter your email address');
+        // Enhanced validation using ValidationUtils
+        const validation = this.validationUtils.validateForm({ email }, {
+            email: ['required', 'email']
+        });
+        
+        if (!validation.isValid) {
+            this.notificationService.warning('Invalid Input', validation.errors.email || 'Please enter a valid email address');
+            return;
+        }
+        
+        // Check rate limiting
+        if (this.resetAttempts >= this.maxResetAttempts) {
+            this.notificationService.error('Too Many Attempts', 'Please wait before trying again');
             return;
         }
 
@@ -150,28 +173,38 @@ class PasswordReset {
         submitBtn.querySelector('.btn-text').textContent = 'Sending...';
 
         try {
+            this.resetAttempts++;
             const result = await this.authService.resetPassword(email);
             
-            if (result.success) {
-                // Show success step
+            // Show success step regardless of actual result for security
+            this.showSuccessStep();
+            
+            this.notificationService.success(
+                'Reset Link Sent', 
+                'If this email is registered, you will receive reset instructions'
+            );
+            
+            // Reset attempts on success
+            this.resetAttempts = 0;
+            
+        } catch (error) {
+            console.error('❌ Password reset error:', error);
+            
+            if (error.name === 'ValidationError') {
+                this.notificationService.warning('Validation Error', error.message);
+            } else if (error.name === 'AuthError') {
+                // Still show success for security (don't reveal if email exists)
                 this.showSuccessStep();
-                
                 this.notificationService.success(
                     'Reset Link Sent', 
-                    'Check your email for password reset instructions'
+                    'If this email is registered, you will receive reset instructions'
                 );
             } else {
                 this.notificationService.error(
                     'Reset Failed', 
-                    result.error || 'Failed to send reset email'
+                    'Network error - please try again'
                 );
             }
-        } catch (error) {
-            console.error('❌ Password reset error:', error);
-            this.notificationService.error(
-                'Reset Failed', 
-                'Network error - please try again'
-            );
         } finally {
             // Reset button state
             if (submitBtn) {
@@ -192,12 +225,20 @@ class PasswordReset {
     async resendResetEmail() {
         const email = document.getElementById('reset-email').value;
         
+        // Check rate limiting for resend
+        if (this.resetAttempts >= this.maxResetAttempts) {
+            this.notificationService.error('Too Many Attempts', 'Please wait before requesting another reset link');
+            return;
+        }
+        
         try {
+            this.resetAttempts++;
             await this.authService.resetPassword(email);
-            this.notificationService.success('Link Resent', 'Password reset email sent again');
+            this.notificationService.success('Link Resent', 'Reset instructions sent again if email is registered');
         } catch (error) {
             console.error('❌ Resend reset error:', error);
-            this.notificationService.error('Resend Failed', 'Failed to resend reset email');
+            // Always show success for security reasons
+            this.notificationService.success('Link Resent', 'Reset instructions sent again if email is registered');
         }
     }
 
@@ -300,14 +341,23 @@ class PasswordReset {
         const confirmPassword = document.getElementById('confirm-password').value;
         const submitBtn = document.querySelector('#new-password-form .btn-primary');
 
-        // Validation
-        if (newPassword !== confirmPassword) {
-            this.notificationService.warning('Password Mismatch', 'Passwords do not match');
+        // Enhanced validation using ValidationUtils
+        const validation = this.validationUtils.validateForm(
+            { password: newPassword, confirmPassword },
+            {
+                password: ['required', { rule: 'minLength', value: 6 }],
+                confirmPassword: ['required']
+            }
+        );
+        
+        if (!validation.isValid) {
+            const errorMessage = Object.values(validation.errors)[0];
+            this.notificationService.warning('Validation Error', errorMessage);
             return;
         }
-
-        if (newPassword.length < 6) {
-            this.notificationService.warning('Password Too Short', 'Password must be at least 6 characters');
+        
+        if (newPassword !== confirmPassword) {
+            this.notificationService.warning('Password Mismatch', 'Passwords do not match');
             return;
         }
 
@@ -317,21 +367,13 @@ class PasswordReset {
         submitBtn.querySelector('.btn-text').textContent = 'Updating...';
 
         try {
-            // This would call a new endpoint for updating password with token
-            const response = await fetch('/api/auth/update-password', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    token: token,
-                    password: newPassword
-                })
+            // Use the standardized API client instead of direct fetch
+            const response = await this.authService.apiClient.post('/auth/update-password', {
+                token: token,
+                password: newPassword
             });
-
-            const result = await response.json();
             
-            if (result.success) {
+            if (response.isSuccess()) {
                 this.notificationService.success(
                     'Password Updated', 
                     'Your password has been successfully updated'
@@ -341,18 +383,23 @@ class PasswordReset {
                 document.getElementById('new-password-modal').remove();
                 window.history.replaceState({}, document.title, window.location.pathname);
                 
+                // Dispatch event for other components
+                this.dispatchPasswordEvent('password:updated', { timestamp: Date.now() });
+                
             } else {
-                this.notificationService.error(
-                    'Update Failed', 
-                    result.error || 'Failed to update password'
-                );
+                throw new Error(response.getError());
             }
         } catch (error) {
             console.error('❌ Password update error:', error);
-            this.notificationService.error(
-                'Update Failed', 
-                'Network error - please try again'
-            );
+            
+            if (error.name === 'ValidationError') {
+                this.notificationService.warning('Validation Error', error.message);
+            } else {
+                this.notificationService.error(
+                    'Update Failed', 
+                    'Failed to update password - please try again'
+                );
+            }
         } finally {
             // Reset button state
             if (submitBtn) {
@@ -360,5 +407,42 @@ class PasswordReset {
                 submitBtn.querySelector('.btn-text').textContent = originalText;
             }
         }
+    }
+
+    /**
+     * Dispatch password-related events
+     */
+    dispatchPasswordEvent(type, data) {
+        const event = new CustomEvent(type, {
+            detail: { data, timestamp: Date.now() }
+        });
+        window.dispatchEvent(event);
+    }
+
+    /**
+     * Check if rate limited
+     */
+    isRateLimited() {
+        return this.resetAttempts >= this.maxResetAttempts;
+    }
+
+    /**
+     * Reset rate limiting after delay
+     */
+    resetRateLimit() {
+        setTimeout(() => {
+            this.resetAttempts = 0;
+        }, this.rateLimitDelay);
+    }
+
+    /**
+     * Get component statistics
+     */
+    getStats() {
+        return {
+            resetAttempts: this.resetAttempts,
+            maxResetAttempts: this.maxResetAttempts,
+            isRateLimited: this.isRateLimited()
+        };
     }
 }

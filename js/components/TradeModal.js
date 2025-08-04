@@ -1,25 +1,58 @@
 /**
  * Trade Modal Component
- * Handles buy/sell order forms and execution
+ * Handles buy/sell order forms and execution with standardized services
  */
 class TradeModal {
-    constructor(portfolioService, notificationService) {
+    constructor(
+        portfolioService = window.lupoPortfolio,
+        notificationService = window.lupoNotifications,
+        validationUtils = window.ValidationUtils,
+        storage = window.lupoStorage
+    ) {
         this.portfolioService = portfolioService;
         this.notificationService = notificationService;
+        this.validationUtils = validationUtils;
+        this.storage = storage;
+        
         this.currentStock = null;
+        this.tradingLimits = {
+            maxShares: 10000,
+            minShares: 1,
+            maxOrderValue: 100000
+        };
+        
+        this.init();
+    }
+
+    init() {
+        console.log('💼 Initializing Trade Modal Component...');
+        this.setupGlobalEventListeners();
+    }
+
+    setupGlobalEventListeners() {
+        // Listen for trade modal open events
+        document.addEventListener('openTradeModal', (e) => {
+            const { type, stock } = e.detail;
+            this.show(type, stock);
+        });
     }
 
     async show(action, stock) {
         if (!stock) {
-            this.notificationService.showToast('⚠️', 'Error', 'Please select a stock first');
+            this.notificationService.error('Error', 'Please select a stock first');
             return;
         }
 
         this.currentStock = stock;
-        const isValidAction = action === 'buy' || action === 'sell';
         
-        if (!isValidAction) {
-            this.notificationService.showToast('⚠️', 'Error', 'Invalid trade action');
+        // Validate action using ValidationUtils
+        const actionValidation = this.validationUtils.validateString(action, { 
+            rule: 'in', 
+            values: ['buy', 'sell'] 
+        });
+        
+        if (!actionValidation.isValid) {
+            this.notificationService.error('Error', 'Invalid trade action');
             return;
         }
 
@@ -197,14 +230,10 @@ class TradeModal {
             parseFloat(document.getElementById('limit-price').value) : 
             stock.price;
 
-        // Validation
-        if (!shares || shares <= 0) {
-            this.notificationService.showToast('⚠️', 'Invalid Input', 'Please enter a valid number of shares');
-            return;
-        }
-
-        if (orderType === 'limit' && (!price || price <= 0)) {
-            this.notificationService.showToast('⚠️', 'Invalid Input', 'Please enter a valid limit price');
+        // Enhanced validation using ValidationUtils
+        const validation = this.validateTradeInput(shares, orderType, price, action, stock);
+        if (!validation.isValid) {
+            this.notificationService.error('Invalid Input', validation.error);
             return;
         }
 
@@ -214,27 +243,46 @@ class TradeModal {
         submitBtn.querySelector('.btn-text').textContent = 'Processing...';
 
         try {
-            const result = await this.portfolioService.executeTrade(stock.symbol, action, shares, price);
+            const tradeOptions = {
+                orderType,
+                limitPrice: orderType === 'limit' ? price : null,
+                timestamp: Date.now()
+            };
             
-            if (result.success) {
-                this.notificationService.showToast(
-                    '✅', 
-                    'Trade Executed', 
-                    `Successfully ${action === 'buy' ? 'bought' : 'sold'} ${shares} shares of ${stock.symbol}`
-                );
-                
-                // Close modal
-                document.getElementById('trade-modal').remove();
-                
-                // Trigger portfolio refresh event
-                document.dispatchEvent(new CustomEvent('portfolioUpdate'));
-                
-            } else {
-                this.notificationService.showToast('❌', 'Trade Failed', result.error || 'Unable to execute trade');
-            }
+            const result = await this.portfolioService.executeTrade(
+                stock.symbol, 
+                action, 
+                shares, 
+                tradeOptions
+            );
+            
+            // Use standardized notification service
+            this.notificationService.showTradeNotification({
+                type: action,
+                symbol: stock.symbol,
+                shares,
+                price: result.executionPrice || price
+            }, 'success');
+            
+            // Store trade in local history for quick access
+            this.storeTradeHistory(result);
+            
+            // Close modal
+            document.getElementById('trade-modal').remove();
+            
+            // Trigger portfolio refresh event
+            this.dispatchTradeEvent('trade:completed', result);
+            
         } catch (error) {
-            console.error('Trade execution error:', error);
-            this.notificationService.showToast('❌', 'Trade Failed', 'Network error - please try again');
+            console.error('❌ Trade execution error:', error);
+            
+            if (error.name === 'TradingError') {
+                this.notificationService.error('Trade Failed', error.message);
+            } else if (error.name === 'ValidationError') {
+                this.notificationService.warning('Validation Error', error.message);
+            } else {
+                this.notificationService.error('Trade Failed', 'Network error - please try again');
+            }
         } finally {
             // Reset button state
             if (submitBtn) {
@@ -242,5 +290,96 @@ class TradeModal {
                 submitBtn.querySelector('.btn-text').textContent = originalText;
             }
         }
+    }
+
+    /**
+     * Validate trade input parameters
+     */
+    validateTradeInput(shares, orderType, price, action, stock) {
+        // Validate shares
+        const sharesValidation = this.validationUtils.validateNumber(shares, {
+            min: this.tradingLimits.minShares,
+            max: this.tradingLimits.maxShares,
+            integer: true
+        });
+        
+        if (!sharesValidation.isValid) {
+            return { isValid: false, error: `Shares must be between ${this.tradingLimits.minShares} and ${this.tradingLimits.maxShares}` };
+        }
+
+        // Validate limit price if limit order
+        if (orderType === 'limit') {
+            const priceValidation = this.validationUtils.validateNumber(price, {
+                min: 0.01,
+                max: 10000
+            });
+            
+            if (!priceValidation.isValid) {
+                return { isValid: false, error: 'Please enter a valid limit price' };
+            }
+        }
+
+        // Validate order value doesn't exceed limits
+        const orderValue = shares * (price || stock.price);
+        if (orderValue > this.tradingLimits.maxOrderValue) {
+            return { isValid: false, error: `Order value exceeds maximum limit of $${this.tradingLimits.maxOrderValue.toLocaleString()}` };
+        }
+
+        return { isValid: true };
+    }
+
+    /**
+     * Store trade in local history
+     */
+    storeTradeHistory(tradeResult) {
+        try {
+            const tradeHistory = this.storage.get('tradeHistory', []);
+            tradeHistory.push({
+                ...tradeResult,
+                timestamp: Date.now(),
+                stored: true
+            });
+            
+            // Keep only last 50 trades
+            if (tradeHistory.length > 50) {
+                tradeHistory.splice(0, tradeHistory.length - 50);
+            }
+            
+            this.storage.set('tradeHistory', tradeHistory);
+        } catch (error) {
+            console.error('❌ Error storing trade history:', error);
+        }
+    }
+
+    /**
+     * Dispatch trade events
+     */
+    dispatchTradeEvent(type, data) {
+        const event = new CustomEvent(type, {
+            detail: { data, timestamp: Date.now() }
+        });
+        window.dispatchEvent(event);
+    }
+
+    /**
+     * Get user's recent trades for context
+     */
+    getRecentTrades(symbol = null) {
+        const history = this.storage.get('tradeHistory', []);
+        if (symbol) {
+            return history.filter(trade => trade.symbol === symbol).slice(-5);
+        }
+        return history.slice(-10);
+    }
+
+    /**
+     * Get component statistics
+     */
+    getStats() {
+        return {
+            currentStock: this.currentStock?.symbol || null,
+            tradingLimits: this.tradingLimits,
+            recentTradeCount: this.getRecentTrades().length
+        };
     }
 }
