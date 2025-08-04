@@ -1,36 +1,114 @@
 // Lupo - Professional Retail-Focused Trading Platform
 
 // Stock Data API Service
+// Portfolio Management Service
+class PortfolioService {
+    constructor() {
+        this.BASE_URL = '/api/user';
+        this.authToken = localStorage.getItem('lupo-auth-token');
+    }
+
+    async getPortfolio() {
+        try {
+            const response = await fetch(`${this.BASE_URL}/portfolio`, {
+                headers: {
+                    'Authorization': `Bearer ${this.authToken}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+
+            const result = await response.json();
+            return result.success ? result.data : null;
+        } catch (error) {
+            console.error('❌ Error fetching portfolio:', error);
+            return null;
+        }
+    }
+
+    async executeTrade(symbol, action, shares, price) {
+        try {
+            console.log(`📈 Executing ${action} order: ${shares} shares of ${symbol} at $${price}`);
+            
+            const response = await fetch(`${this.BASE_URL}/portfolio/trade`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${this.authToken}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    symbol,
+                    action,
+                    shares: parseInt(shares),
+                    price: parseFloat(price)
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+
+            const result = await response.json();
+            return result;
+        } catch (error) {
+            console.error('❌ Error executing trade:', error);
+            throw error;
+        }
+    }
+
+    async getTransactionHistory() {
+        try {
+            const response = await fetch(`${this.BASE_URL}/transactions`, {
+                headers: {
+                    'Authorization': `Bearer ${this.authToken}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+
+            const result = await response.json();
+            return result.success ? result.data : [];
+        } catch (error) {
+            console.error('❌ Error fetching transactions:', error);
+            return [];
+        }
+    }
+}
+
 class StockDataService {
     constructor() {
-        // Alpha Vantage API configuration
-        this.API_KEY = 'MRUM29SGMJPSAX9M'; // Alpha Vantage API key
-        this.BASE_URL = 'https://www.alphavantage.co/query';
-        this.requestCount = 0;
-        this.maxRequestsPerMinute = 5; // Free tier limit
-        this.lastRequestTime = 0;
+        // PHP API configuration
+        this.BASE_URL = '/api/stocks';
+        this.authToken = localStorage.getItem('lupo-auth-token');
     }
 
     async fetchStockQuote(symbol) {
-        if (!this.canMakeRequest()) {
-            console.warn('⚠️ API rate limit reached, using cached/demo data');
-            return this.getDemoStockData(symbol);
-        }
-
         try {
-            const url = `${this.BASE_URL}?function=GLOBAL_QUOTE&symbol=${symbol}&apikey=${this.API_KEY}`;
             console.log(`📡 Fetching real-time data for ${symbol}`);
             
-            const response = await fetch(url);
-            const data = await response.json();
+            const response = await fetch(`${this.BASE_URL}/quote/${symbol}`, {
+                headers: {
+                    'Authorization': `Bearer ${this.authToken}`,
+                    'Content-Type': 'application/json'
+                }
+            });
             
-            this.updateRequestTracking();
-
-            if (data['Global Quote']) {
-                return this.parseAlphaVantageQuote(data['Global Quote'], symbol);
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+            
+            const result = await response.json();
+            
+            if (result.success && result.data) {
+                return result.data;
             } else {
-                console.warn(`⚠️ API returned no data for ${symbol}, using demo data`);
-                return this.getDemoStockData(symbol);
+                throw new Error(result.error || 'No data returned');
             }
         } catch (error) {
             console.error(`❌ Error fetching data for ${symbol}:`, error);
@@ -39,8 +117,31 @@ class StockDataService {
     }
 
     async fetchMultipleStocks(symbols) {
-        const promises = symbols.map(symbol => this.fetchStockQuote(symbol));
-        return Promise.all(promises);
+        try {
+            const response = await fetch(`${this.BASE_URL}/quotes`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${this.authToken}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ symbols })
+            });
+            
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+            
+            const result = await response.json();
+            
+            if (result.success && result.data) {
+                return result.data;
+            } else {
+                throw new Error(result.error || 'No data returned');
+            }
+        } catch (error) {
+            console.error('❌ Error fetching multiple stocks:', error);
+            return symbols.map(symbol => this.getDemoStockData(symbol));
+        }
     }
 
     parseAlphaVantageQuote(quote, symbol) {
@@ -136,9 +237,14 @@ class LupoPlatform {
     constructor() {
         // Initialize stock data service
         this.stockService = new StockDataService();
+        this.portfolioService = new PortfolioService();
         
         // Initialize personal watchlist
-        this.watchlist = this.loadWatchlistFromStorage();
+        this.watchlist = [];
+        this.loadWatchlistFromStorage().then(watchlist => {
+            this.watchlist = watchlist;
+            this.renderWatchlist();
+        });
         
         // Initialize portfolio system
         this.portfolio = this.loadPortfolioFromStorage();
@@ -366,6 +472,23 @@ class LupoPlatform {
             if (symbol) {
                 console.log('🎯 Opening investment analysis for:', symbol);
                 this.openStockModal(symbol);
+            }
+        });
+
+        // Buy/Sell Modal Handlers
+        document.addEventListener('click', async (e) => {
+            if (e.target.id === 'buy-stock' || e.target.closest('#buy-stock')) {
+                e.preventDefault();
+                await this.showTradeModal('buy');
+            } else if (e.target.id === 'sell-stock' || e.target.closest('#sell-stock')) {
+                e.preventDefault();
+                await this.showTradeModal('sell');
+            } else if (e.target.id === 'add-to-watchlist-modal' || e.target.closest('#add-to-watchlist-modal')) {
+                e.preventDefault();
+                await this.addToWatchlist();
+            } else if (e.target.id === 'set-alert-modal' || e.target.closest('#set-alert-modal')) {
+                e.preventDefault();
+                this.showToast('🔔', 'Alert Set', 'You\'ll be notified of significant changes!');
             }
         });
 
@@ -1137,7 +1260,7 @@ class LupoPlatform {
     async refreshAllData() {
         const refreshButton = document.getElementById('refresh-data');
         if (refreshButton) {
-            refreshButton.textContent = '🔄 Refreshing...';
+            refreshButton.innerHTML = '<span class="refresh-icon"></span><span class="btn-text">Refreshing...</span>';
             refreshButton.disabled = true;
         }
         
@@ -1153,7 +1276,7 @@ class LupoPlatform {
             this.showToast('⚠️', 'Update Failed', 'Using cached data due to API limits');
         } finally {
             if (refreshButton) {
-                refreshButton.textContent = '🔄 Refresh Data';  
+                refreshButton.innerHTML = '<span class="refresh-icon"></span><span class="btn-text">Refresh Data</span>';  
                 refreshButton.disabled = false;
             }
         }
@@ -1199,18 +1322,34 @@ class LupoPlatform {
             addButton.textContent = '🔄 Adding...';
             addButton.disabled = true;
 
-            // Fetch stock data
-            const stockData = await this.stockService.fetchStockQuote(symbol);
+            // Add to watchlist via API
+            const response = await fetch('/api/user/watchlist', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('lupo-auth-token')}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ symbol })
+            });
             
-            // Add to watchlist
-            this.watchlist.push(stockData);
-            this.saveWatchlistToStorage();
-            this.renderWatchlist();
-
-            // Clear search and show success
-            searchInput.value = '';
-            this.clearSearchSuggestions();
-            this.showToast('✅', 'Stock Added', `${symbol} added to your watchlist`);
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                // Reload watchlist from server
+                this.watchlist = await this.loadWatchlistFromStorage();
+                this.renderWatchlist();
+                
+                // Clear search and show success
+                searchInput.value = '';
+                this.clearSearchSuggestions();
+                this.showToast('✅', 'Stock Added', `${symbol} added to your watchlist`);
+            } else {
+                throw new Error(result.error || 'Failed to add stock');
+            }
 
             // Restore button
             addButton.textContent = originalText;
@@ -1410,13 +1549,45 @@ class LupoPlatform {
 // Login System
 class LoginSystem {
     constructor() {
-        this.isLoggedIn = this.checkLoginStatus();
+        this.isLoggedIn = false;
         this.setupLoginHandlers();
+        this.initializeAuth();
+    }
+    
+    async initializeAuth() {
+        this.isLoggedIn = await this.checkLoginStatus();
+        if (this.isLoggedIn) {
+            this.showMainApp();
+            this.initializePlatform();
+        }
     }
 
-    checkLoginStatus() {
-        // Check if user was previously logged in
-        return localStorage.getItem('lupo-logged-in') === 'true';
+    async checkLoginStatus() {
+        // Check if user has valid token
+        const token = localStorage.getItem('lupo-auth-token');
+        if (!token) return false;
+        
+        try {
+            const response = await fetch('/api/auth/verify', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            if (!response.ok) {
+                localStorage.removeItem('lupo-auth-token');
+                return false;
+            }
+            
+            const result = await response.json();
+            return result.success && result.data.valid;
+        } catch (error) {
+            console.error('Token verification failed:', error);
+            localStorage.removeItem('lupo-auth-token');
+            return false;
+        }
     }
 
     setupLoginHandlers() {
@@ -1434,7 +1605,7 @@ class LoginSystem {
         });
     }
 
-    handleLogin() {
+    async handleLogin() {
         const email = document.getElementById('login-email')?.value;
         const password = document.getElementById('login-password')?.value;
         const loginButton = document.getElementById('login-button');
@@ -1444,11 +1615,32 @@ class LoginSystem {
             return;
         }
 
-        // Simple demo validation (in real app, this would be server-side)
-        if (email === 'demo@lupo.com' && password === 'demo123') {
-            this.performLogin(loginButton);
-        } else {
-            this.showLoginError('Invalid credentials. Use demo@lupo.com / demo123');
+        // Authenticate with backend API
+        try {
+            const response = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    email: email,
+                    password: password
+                })
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                // Store session info
+                localStorage.setItem('lupo-auth-token', result.data.token);
+                localStorage.setItem('lupo-user', JSON.stringify(result.data.user));
+                this.performLogin(loginButton);
+            } else {
+                this.showLoginError(result.error || 'Invalid credentials');
+            }
+        } catch (error) {
+            console.error('Login error:', error);
+            this.showLoginError('Login failed. Please check your connection and try again.');
         }
     }
 
@@ -1523,14 +1715,332 @@ class LoginSystem {
     }
 
     logout() {
-        localStorage.removeItem('lupo-logged-in');
+        localStorage.removeItem('lupo-auth-token');
+        localStorage.removeItem('lupo-user-data');
         location.reload(); // Simple logout - reload page
+    }
+}
+
+// Theme Toggle System
+class ThemeToggle {
+    constructor() {
+        this.init();
+    }
+
+    init() {
+        // Get saved theme or default to light
+        const savedTheme = localStorage.getItem('lupo-theme') || 'light';
+        this.setTheme(savedTheme);
+        
+        // Set up toggle listeners for both login and main app
+        const loginToggle = document.getElementById('theme-toggle');
+        const mainToggle = document.getElementById('main-theme-toggle');
+        
+        if (loginToggle) {
+            // Set initial toggle state
+            loginToggle.checked = savedTheme === 'dark';
+            
+            // Listen for toggle changes
+            loginToggle.addEventListener('change', (e) => {
+                const newTheme = e.target.checked ? 'dark' : 'light';
+                this.setTheme(newTheme);
+                localStorage.setItem('lupo-theme', newTheme);
+                this.syncToggles(newTheme);
+                console.log(`🎨 Theme switched to: ${newTheme}`);
+            });
+        }
+        
+        if (mainToggle) {
+            // Set initial toggle state
+            mainToggle.checked = savedTheme === 'dark';
+            
+            // Listen for toggle changes
+            mainToggle.addEventListener('change', (e) => {
+                const newTheme = e.target.checked ? 'dark' : 'light';
+                this.setTheme(newTheme);
+                localStorage.setItem('lupo-theme', newTheme);
+                this.syncToggles(newTheme);
+                console.log(`🎨 Theme switched to: ${newTheme}`);
+            });
+        }
+    }
+    
+    syncToggles(theme) {
+        const isDark = theme === 'dark';
+        const loginToggle = document.getElementById('theme-toggle');
+        const mainToggle = document.getElementById('main-theme-toggle');
+        
+        if (loginToggle) loginToggle.checked = isDark;
+        if (mainToggle) mainToggle.checked = isDark;
+    }
+
+    setTheme(theme) {
+        document.documentElement.setAttribute('data-theme', theme);
+        
+        // Update any additional elements that need theme-specific handling
+        const body = document.body;
+        body.classList.remove('light-theme', 'dark-theme');
+        body.classList.add(`${theme}-theme`);
+    }
+
+    toggleTheme() {
+        const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+        const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+        this.setTheme(newTheme);
+        localStorage.setItem('lupo-theme', newTheme);
+        
+        // Update toggle button state
+        const themeToggle = document.getElementById('theme-toggle');
+        if (themeToggle) {
+            themeToggle.checked = newTheme === 'dark';
+        }
+    }
+
+    // Trade Modal Functionality
+    async showTradeModal(action) {
+        if (!this.currentStock) {
+            this.showToast('⚠️', 'Error', 'Please select a stock first');
+            return;
+        }
+
+        const stock = this.currentStock;
+        const isValidAction = action === 'buy' || action === 'sell';
+        
+        if (!isValidAction) {
+            this.showToast('⚠️', 'Error', 'Invalid trade action');
+            return;
+        }
+
+        // Create trade modal HTML
+        const tradeModalHTML = `
+            <div id="trade-modal" class="modal">
+                <div class="modal-overlay"></div>
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2>${action === 'buy' ? 'Buy' : 'Sell'} ${stock.symbol}</h2>
+                        <button id="close-trade-modal" class="modal-close">
+                            <span class="close-icon"></span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="trade-form">
+                            <div class="stock-info">
+                                <div class="stock-header">
+                                    <h3>${stock.symbol} - ${stock.name}</h3>
+                                    <span class="current-price">$${stock.price.toFixed(2)}</span>
+                                </div>
+                                <div class="price-change ${stock.change >= 0 ? 'positive' : 'negative'}">
+                                    ${stock.change >= 0 ? '+' : ''}${stock.change.toFixed(2)} (${stock.changePercent.toFixed(2)}%)
+                                </div>
+                            </div>
+                            
+                            <form id="trade-form" class="trade-form-inputs">
+                                <div class="form-group">
+                                    <label for="shares">Number of Shares</label>
+                                    <input type="number" id="shares" min="1" max="10000" step="1" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="order-type">Order Type</label>
+                                    <select id="order-type">
+                                        <option value="market">Market Order</option>
+                                        <option value="limit">Limit Order</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group limit-price" style="display: none;">
+                                    <label for="limit-price">Limit Price</label>
+                                    <input type="number" id="limit-price" step="0.01" value="${stock.price.toFixed(2)}">
+                                </div>
+                                
+                                <div class="trade-summary">
+                                    <div class="summary-row">
+                                        <span>Estimated Total:</span>
+                                        <span id="estimated-total">$0.00</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-actions">
+                                    <button type="submit" class="btn btn-primary trade-submit">
+                                        <span class="${action === 'buy' ? 'buy-icon' : 'sell-icon'}"></span>
+                                        <span class="btn-text">${action === 'buy' ? 'Buy Shares' : 'Sell Shares'}</span>
+                                    </button>
+                                    <button type="button" class="btn btn-secondary" onclick="document.getElementById('trade-modal').remove()">Cancel</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // Remove existing trade modal if any
+        const existingModal = document.getElementById('trade-modal');
+        if (existingModal) {
+            existingModal.remove();
+        }
+
+        // Add to DOM
+        document.body.insertAdjacentHTML('beforeend', tradeModalHTML);
+
+        // Show modal
+        const modal = document.getElementById('trade-modal');
+        modal.classList.remove('hidden');
+
+        // Setup event listeners
+        this.setupTradeModalListeners(action, stock);
+    }
+
+    setupTradeModalListeners(action, stock) {
+        const modal = document.getElementById('trade-modal');
+        const closeBtn = document.getElementById('close-trade-modal');
+        const overlay = modal.querySelector('.modal-overlay');
+        const form = document.getElementById('trade-form');
+        const sharesInput = document.getElementById('shares');
+        const orderTypeSelect = document.getElementById('order-type');
+        const limitPriceInput = document.getElementById('limit-price');
+        const estimatedTotal = document.getElementById('estimated-total');
+
+        // Close modal handlers
+        closeBtn.addEventListener('click', () => modal.remove());
+        overlay.addEventListener('click', () => modal.remove());
+
+        // Order type change handler
+        orderTypeSelect.addEventListener('change', (e) => {
+            const limitPriceGroup = modal.querySelector('.limit-price');
+            if (e.target.value === 'limit') {
+                limitPriceGroup.style.display = 'block';
+            } else {
+                limitPriceGroup.style.display = 'none';
+            }
+            this.updateEstimatedTotal();
+        });
+
+        // Update estimated total on input changes
+        sharesInput.addEventListener('input', () => this.updateEstimatedTotal());
+        limitPriceInput.addEventListener('input', () => this.updateEstimatedTotal());
+
+        // Form submission
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            await this.executeTrade(action, stock);
+        });
+
+        // Initialize estimated total
+        this.updateEstimatedTotal();
+    }
+
+    updateEstimatedTotal() {
+        const sharesInput = document.getElementById('shares');
+        const orderTypeSelect = document.getElementById('order-type');
+        const limitPriceInput = document.getElementById('limit-price');
+        const estimatedTotal = document.getElementById('estimated-total');
+
+        if (!sharesInput || !estimatedTotal) return;
+
+        const shares = parseInt(sharesInput.value) || 0;
+        const orderType = orderTypeSelect.value;
+        const price = orderType === 'limit' ? 
+            parseFloat(limitPriceInput.value) || this.currentStock.price : 
+            this.currentStock.price;
+
+        const total = shares * price;
+        estimatedTotal.textContent = `$${total.toFixed(2)}`;
+    }
+
+    async executeTrade(action, stock) {
+        const form = document.getElementById('trade-form');
+        const submitBtn = form.querySelector('.trade-submit');
+        const shares = parseInt(document.getElementById('shares').value);
+        const orderType = document.getElementById('order-type').value;
+        const price = orderType === 'limit' ? 
+            parseFloat(document.getElementById('limit-price').value) : 
+            stock.price;
+
+        if (!shares || shares <= 0) {
+            this.showToast('⚠️', 'Invalid Input', 'Please enter a valid number of shares');
+            return;
+        }
+
+        // Show loading state
+        submitBtn.disabled = true;
+        submitBtn.querySelector('.btn-text').textContent = 'Processing...';
+
+        try {
+            const result = await this.portfolioService.executeTrade(stock.symbol, action, shares, price);
+            
+            if (result.success) {
+                this.showToast('✅', 'Trade Executed', `Successfully ${action === 'buy' ? 'bought' : 'sold'} ${shares} shares of ${stock.symbol}`);
+                
+                // Close modal
+                document.getElementById('trade-modal').remove();
+                
+                // Refresh portfolio data
+                await this.loadPortfolioData();
+                
+            } else {
+                this.showToast('❌', 'Trade Failed', result.error || 'Unable to execute trade');
+            }
+        } catch (error) {
+            console.error('Trade execution error:', error);
+            this.showToast('❌', 'Trade Failed', 'Network error - please try again');
+        } finally {
+            // Reset button state
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.querySelector('.btn-text').textContent = action === 'buy' ? 'Buy Shares' : 'Sell Shares';
+            }
+        }
+    }
+
+    async loadPortfolioData() {
+        try {
+            const portfolio = await this.portfolioService.getPortfolio();
+            if (portfolio) {
+                // Update portfolio display
+                this.renderPortfolio(portfolio);
+                console.log('✅ Portfolio data refreshed');
+            }
+        } catch (error) {
+            console.error('❌ Error loading portfolio data:', error);
+        }
+    }
+
+    async addToWatchlist() {
+        if (!this.currentStock) {
+            this.showToast('⚠️', 'Error', 'Please select a stock first');
+            return;
+        }
+
+        try {
+            // Add to local watchlist
+            if (!this.watchlist.find(stock => stock.symbol === this.currentStock.symbol)) {
+                this.watchlist.push(this.currentStock);
+                
+                // Save to localStorage
+                localStorage.setItem('lupo-watchlist', JSON.stringify(this.watchlist));
+                
+                this.showToast('📊', 'Added to Watchlist', `${this.currentStock.symbol} is now being tracked`);
+                
+                // Re-render watchlist
+                this.renderWatchlist();
+            } else {
+                this.showToast('ℹ️', 'Already in Watchlist', `${this.currentStock.symbol} is already being tracked`);
+            }
+        } catch (error) {
+            console.error('❌ Error adding to watchlist:', error);
+            this.showToast('❌', 'Error', 'Failed to add stock to watchlist');
+        }
     }
 }
 
 // Initialize Login System and Platform when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     console.log('🚀 DOM loaded, initializing Lupo...');
+    
+    // Initialize theme toggle
+    const themeToggle = new ThemeToggle();
+    window.lupoTheme = themeToggle;
     
     const loginSystem = new LoginSystem();
     

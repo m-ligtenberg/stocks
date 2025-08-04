@@ -31,7 +31,8 @@ switch ($method) {
 function handlePost($action) {
     $input = json_decode(file_get_contents('php://input'), true);
     
-    if (!$input) {
+    // Verify endpoint doesn't need JSON payload
+    if ($action !== 'verify' && !$input) {
         errorResponse('Invalid JSON payload');
     }
     

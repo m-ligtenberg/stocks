@@ -19,7 +19,7 @@ session_start();
 // Define constants
 define('APP_NAME', 'Lupo Trading Platform');
 define('APP_VERSION', '1.0.0');
-define('BASE_URL', 'http://localhost:8000');
+define('BASE_URL', 'http://localhost:8092');
 
 // API Configuration
 define('ALPHA_VANTAGE_API_KEY', 'MRUM29SGMJPSAX9M');
@@ -46,9 +46,10 @@ date_default_timezone_set('America/New_York');
 
 // CORS headers for API
 function setCorsHeaders() {
-    header('Access-Control-Allow-Origin: *');
+    header('Access-Control-Allow-Origin: http://localhost:8092');
     header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
     header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With');
+    header('Access-Control-Allow-Credentials: true');
     header('Content-Type: application/json');
     
     if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {

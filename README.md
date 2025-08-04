@@ -22,8 +22,9 @@ A professional trading platform that empowers retail investors through market tr
 ## 🛠️ Setup Instructions
 
 ### Prerequisites
-- Node.js 16+ 
-- npm or yarn
+- PHP 7.4+
+- Web server (Apache/Nginx) or PHP built-in server
+- SQLite support (usually included with PHP)
 
 ### Installation
 
@@ -32,24 +33,20 @@ A professional trading platform that empowers retail investors through market tr
    cd Lupo
    ```
 
-2. **Install dependencies:**
+2. **Create data directory:**
    ```bash
-   npm install
+   mkdir -p data
+   chmod 755 data
    ```
 
-3. **Start the server:**
+3. **Start PHP development server:**
    ```bash
-   npm start
-   ```
-   
-   Or for development with auto-reload:
-   ```bash
-   npm run dev
+   php -S localhost:8000
    ```
 
 4. **Open your browser:**
    ```
-   http://localhost:3000
+   http://localhost:8000
    ```
 
 ### Demo Login
@@ -82,11 +79,11 @@ A professional trading platform that empowers retail investors through market tr
 ## 🔧 Architecture
 
 ### Backend
-- **Express.js** - Web framework
+- **PHP 7.4+** - Server-side scripting
 - **SQLite** - Lightweight database
 - **JWT** - Secure authentication  
-- **bcrypt** - Password hashing
-- **Helmet** - Security headers
+- **PDO** - Database abstraction layer
+- **Security Headers** - XSS/CSRF protection
 - **Rate Limiting** - API protection
 
 ### Frontend
@@ -112,18 +109,21 @@ A professional trading platform that empowers retail investors through market tr
 - **SQL Injection Protection** - Parameterized queries
 - **CORS Configuration** - Controlled cross-origin access
 
-## 🌱 Environment Variables
+## 🔧 Configuration
 
-Create a `.env` file (already included):
+All configuration is in `config/config.php`:
 
-```env
-PORT=3000
-NODE_ENV=development
-JWT_SECRET=your_super_secret_key
-ALPHA_VANTAGE_API_KEY=your_api_key
-DATABASE_URL=./lupo.db
-BCRYPT_ROUNDS=12
-JWT_EXPIRES_IN=7d
+```php
+// API Configuration
+define('ALPHA_VANTAGE_API_KEY', 'your_api_key');
+
+// Security settings
+define('JWT_SECRET', 'your_super_secret_key');
+define('SESSION_LIFETIME', 3600 * 24 * 7); // 7 days
+
+// Rate limiting
+define('RATE_LIMIT_REQUESTS', 100);
+define('RATE_LIMIT_WINDOW', 900); // 15 minutes
 ```
 
 ## 📈 Data Sources
@@ -151,23 +151,22 @@ JWT_EXPIRES_IN=7d
 
 ### Local Development
 ```bash
-npm run dev
+php -S localhost:8000
 ```
 
 ### Production
-```bash
-NODE_ENV=production npm start
-```
+- Upload files to web server
+- Ensure `data/` directory is writable
+- Point domain to project root
+- Configure `.htaccess` for clean URLs (optional)
 
 ### Docker (Future)
 ```dockerfile
-FROM node:16-alpine
-WORKDIR /app
-COPY package*.json ./
-RUN npm ci --only=production
+FROM php:7.4-apache
+WORKDIR /var/www/html
 COPY . .
-EXPOSE 3000
-CMD ["npm", "start"]
+RUN mkdir -p data && chmod 755 data
+EXPOSE 80
 ```
 
 ## 🤝 Contributing
