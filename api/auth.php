@@ -5,150 +5,102 @@
  */
 
 require_once __DIR__ . '/../config/config.php';
+require_once __DIR__ . '/BaseApi.php';
 
-setCorsHeaders();
-
-// Rate limiting
-if (!checkRateLimit($_SERVER['REMOTE_ADDR'])) {
-    errorResponse('Too many requests. Please try again later.', 429);
-}
-
-$method = $_SERVER['REQUEST_METHOD'];
-$path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-$pathParts = explode('/', trim($path, '/'));
-
-// Get the action from URL (e.g., /api/auth/login)
-$action = end($pathParts);
-
-switch ($method) {
-    case 'POST':
-        handlePost($action);
-        break;
-    default:
-        errorResponse('Method not allowed', 405);
-}
-
-function handlePost($action) {
-    $input = json_decode(file_get_contents('php://input'), true);
+class AuthApi extends BaseApi {
     
-    // Verify endpoint doesn't need JSON payload
-    if ($action !== 'verify' && !$input) {
-        errorResponse('Invalid JSON payload');
+    protected function requiresAuth() {
+        // Only verify endpoint requires auth, others are public
+        $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+        return strpos($path, '/verify') !== false;
     }
     
-    switch ($action) {
-        case 'register':
-            registerUser($input);
-            break;
-        case 'login':
-            loginUser($input);
-            break;
-        case 'verify':
-            verifyToken();
-            break;
-        default:
-            errorResponse('Invalid endpoint', 404);
-    }
-}
-
-function registerUser($input) {
-    $required = ['email', 'password'];
-    $missing = validateRequired($input, $required);
-    
-    if (!empty($missing)) {
-        errorResponse('Missing required fields: ' . implode(', ', $missing));
-    }
-    
-    $email = sanitizeInput($input['email']);
-    $password = $input['password'];
-    $firstName = sanitizeInput($input['firstName'] ?? '');
-    $lastName = sanitizeInput($input['lastName'] ?? '');
-    
-    // Validate email
-    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        errorResponse('Invalid email format');
-    }
-    
-    // Validate password
-    if (strlen($password) < 6) {
-        errorResponse('Password must be at least 6 characters long');
-    }
-    
-    $db = new Database();
-    $conn = $db->getConnection();
-    
-    try {
-        // Check if user exists
-        $stmt = $conn->prepare("SELECT id FROM users WHERE email = ?");
-        $stmt->execute([$email]);
+    protected function handlePost($pathParts) {
+        $action = end($pathParts);
         
-        if ($stmt->fetch()) {
-            errorResponse('User with this email already exists', 409);
+        switch ($action) {
+            case 'register':
+                $this->registerUser();
+                break;
+            case 'login':
+                $this->loginUser();
+                break;
+            case 'verify':
+                $this->verifyToken();
+                break;
+            default:
+                throw new NotFoundException('Invalid endpoint');
         }
+    }
+    
+    private function registerUser() {
+        $input = $this->getJsonInput(['email', 'password']);
         
-        // Hash password
-        $passwordHash = password_hash($password, PASSWORD_DEFAULT);
+        $email = $this->sanitizeInput($input['email']);
+        $password = $input['password'];
+        $firstName = $this->sanitizeInput($input['firstName'] ?? '');
+        $lastName = $this->sanitizeInput($input['lastName'] ?? '');
         
-        // Create user
-        $conn->beginTransaction();
+        // Validate input
+        $this->validateEmail($email);
+        $this->validatePassword($password);
         
-        $stmt = $conn->prepare("
-            INSERT INTO users (email, password_hash, first_name, last_name) 
-            VALUES (?, ?, ?, ?)
-        ");
-        $stmt->execute([$email, $passwordHash, $firstName, $lastName]);
-        
-        $userId = $conn->lastInsertId();
-        
-        // Create portfolio
-        $stmt = $conn->prepare("
-            INSERT INTO user_portfolios (user_id, cash_balance, total_value) 
-            VALUES (?, ?, ?)
-        ");
-        $stmt->execute([$userId, 10000.00, 10000.00]);
-        
-        $conn->commit();
+        $result = $this->executeTransaction(function($conn) use ($email, $password, $firstName, $lastName) {
+            // Check if user exists
+            $stmt = $conn->prepare("SELECT id FROM users WHERE email = ?");
+            $stmt->execute([$email]);
+            
+            if ($stmt->fetch()) {
+                throw new ValidationException('User with this email already exists');
+            }
+            
+            // Hash password
+            $passwordHash = password_hash($password, PASSWORD_DEFAULT);
+            
+            // Create user
+            $stmt = $conn->prepare("
+                INSERT INTO users (email, password_hash, first_name, last_name) 
+                VALUES (?, ?, ?, ?)
+            ");
+            $stmt->execute([$email, $passwordHash, $firstName, $lastName]);
+            
+            $userId = $conn->lastInsertId();
+            
+            // Create portfolio
+            $stmt = $conn->prepare("
+                INSERT INTO user_portfolios (user_id, cash_balance, total_value) 
+                VALUES (?, ?, ?)
+            ");
+            $stmt->execute([$userId, 10000.00, 10000.00]);
+            
+            return $userId;
+        });
         
         // Generate JWT
         $token = generateJWT([
-            'userId' => $userId,
+            'userId' => $result,
             'email' => $email,
             'exp' => time() + SESSION_LIFETIME
         ]);
         
-        successResponse([
+        $this->successResponse([
             'user' => [
-                'id' => $userId,
+                'id' => $result,
                 'email' => $email,
                 'firstName' => $firstName,
                 'lastName' => $lastName
             ],
             'token' => $token
-        ], 'User registered successfully');
+        ], 'User registered successfully', 201);
+    }
+    
+    private function loginUser() {
+        $input = $this->getJsonInput(['email', 'password']);
         
-    } catch (PDOException $e) {
-        $conn->rollback();
-        error_log("Registration error: " . $e->getMessage());
-        errorResponse('Registration failed', 500);
-    }
-}
-
-function loginUser($input) {
-    $required = ['email', 'password'];
-    $missing = validateRequired($input, $required);
-    
-    if (!empty($missing)) {
-        errorResponse('Missing required fields: ' . implode(', ', $missing));
-    }
-    
-    $email = sanitizeInput($input['email']);
-    $password = $input['password'];
-    
-    $db = new Database();
-    $conn = $db->getConnection();
-    
-    try {
-        $stmt = $conn->prepare("
+        $email = $this->sanitizeInput($input['email']);
+        $password = $input['password'];
+        
+        $stmt = $this->db->getConnection()->prepare("
             SELECT id, email, password_hash, first_name, last_name 
             FROM users WHERE email = ?
         ");
@@ -156,7 +108,7 @@ function loginUser($input) {
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
         
         if (!$user || !password_verify($password, $user['password_hash'])) {
-            errorResponse('Invalid credentials', 401);
+            throw new AuthenticationException('Invalid credentials');
         }
         
         // Generate JWT
@@ -166,7 +118,7 @@ function loginUser($input) {
             'exp' => time() + SESSION_LIFETIME
         ]);
         
-        successResponse([
+        $this->successResponse([
             'user' => [
                 'id' => $user['id'],
                 'email' => $user['email'],
@@ -175,22 +127,20 @@ function loginUser($input) {
             ],
             'token' => $token
         ], 'Login successful');
-        
-    } catch (PDOException $e) {
-        error_log("Login error: " . $e->getMessage());
-        errorResponse('Login failed', 500);
+    }
+    
+    private function verifyToken() {
+        $this->successResponse([
+            'valid' => true,
+            'user' => [
+                'id' => $this->user['userId'],
+                'email' => $this->user['email']
+            ]
+        ]);
     }
 }
 
-function verifyToken() {
-    $payload = requireAuth();
-    
-    successResponse([
-        'valid' => true,
-        'user' => [
-            'id' => $payload['userId'],
-            'email' => $payload['email']
-        ]
-    ]);
-}
+// Initialize and handle request
+$api = new AuthApi();
+$api->handleRequest();
 ?>
