@@ -52,6 +52,10 @@ class StateSyncService {
     init() {
         console.log('🔄 Initializing State Synchronization Service...');
         
+        if (!this.appState) {
+            console.warn('⚠️ AppState not available, StateSyncService will have limited functionality');
+        }
+        
         // Setup automatic service registration
         this.setupServiceRegistration();
         
@@ -102,6 +106,35 @@ class StateSyncService {
                 };
             }
         });
+    }
+
+    /**
+     * Sync method result to state
+     */
+    syncMethodResult(serviceName, methodName, result, args) {
+        if (!this.appState) return;
+        
+        try {
+            switch (serviceName) {
+                case 'auth':
+                    if (methodName === 'login' && result) {
+                        this.appState.setAuthenticationState({
+                            user: result.user,
+                            token: result.token,
+                            permissions: result.user?.permissions || []
+                        });
+                    }
+                    break;
+                case 'portfolio':
+                    if (methodName === 'getPortfolio' && result) {
+                        this.appState.updatePortfolio(result);
+                    }
+                    break;
+                // Add more service method mappings as needed
+            }
+        } catch (error) {
+            console.error(`Error syncing ${serviceName}.${methodName} result:`, error);
+        }
     }
 
     async syncServiceToState(name, service) {
@@ -195,9 +228,13 @@ class StateSyncService {
      */
     setupStateListeners() {
         // Listen to state changes and sync to services
-        this.appState.subscribe('state-sync', (prevState, newState, action) => {
-            this.handleStateChange(prevState, newState, action);
-        });
+        if (this.appState?.subscribe) {
+            this.appState.subscribe('state-sync', (prevState, newState, action) => {
+                this.handleStateChange(prevState, newState, action);
+            });
+        } else {
+            console.warn('⚠️ AppState not available for state listeners');
+        }
     }
 
     handleStateChange(prevState, newState, action) {
@@ -538,9 +575,25 @@ class StateSyncService {
     }
 }
 
-// Create global instance
-const lupoStateSync = new StateSyncService();
+// Factory function to create instance when ready
+function createStateSyncService() {
+    if (!window.lupoStateSync) {
+        window.lupoStateSync = new StateSyncService();
+    }
+    return window.lupoStateSync;
+}
 
 // Export for use
 window.StateSyncService = StateSyncService;
-window.lupoStateSync = lupoStateSync;
+window.createStateSyncService = createStateSyncService;
+
+// Create instance when DOM is ready and dependencies are available
+document.addEventListener('DOMContentLoaded', () => {
+    // Wait for AppState to be ready
+    setTimeout(() => {
+        if (window.lupoAppState || window.createAppStateManager) {
+            window.lupoStateSync = createStateSyncService();
+            console.log('✅ State Sync Service ready');
+        }
+    }, 200);
+});

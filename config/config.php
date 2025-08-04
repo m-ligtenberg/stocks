@@ -19,7 +19,7 @@ session_start();
 // Define constants
 define('APP_NAME', 'Lupo Trading Platform');
 define('APP_VERSION', '1.0.0');
-define('BASE_URL', 'http://localhost:8092');
+define('BASE_URL', 'http://localhost:8000');
 
 // API Configuration
 define('ALPHA_VANTAGE_API_KEY', 'MRUM29SGMJPSAX9M');

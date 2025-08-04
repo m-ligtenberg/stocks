@@ -93,7 +93,9 @@ class PortfolioDashboard {
             this.render();
         } catch (error) {
             console.error('❌ Error loading portfolio data:', error);
-            this.notificationService.error('Portfolio Error', 'Failed to load portfolio data');
+            if (this.notificationService) {
+                this.notificationService.error('Portfolio Error', 'Failed to load portfolio data');
+            }
         }
     }
 

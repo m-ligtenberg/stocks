@@ -229,3 +229,6 @@ class ValidationUtils {
         return { isValid: true, error: null };
     }
 }
+
+// Export for global use
+window.ValidationUtils = ValidationUtils;

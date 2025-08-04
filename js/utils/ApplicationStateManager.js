@@ -27,7 +27,7 @@ class ApplicationStateManager extends StateManager {
         // State update batching for performance
         this.batchedUpdates = [];
         this.batchTimeout = null;
-        this.batchDelay = this.config.get('state.batchDelay', 50);
+        this.batchDelay = this.config?.get ? this.config.get('state.batchDelay', 50) : 50;
         
         // Cross-component event system
         this.eventHandlers = new Map();
@@ -412,12 +412,21 @@ class ApplicationStateManager extends StateManager {
      */
     loadPersistedState() {
         try {
+            if (!this.storage?.get) {
+                console.log('📂 Storage service not ready, skipping state loading');
+                return;
+            }
+            
             const persistedState = this.storage.get('lupo-app-state');
             if (persistedState) {
                 // Merge with initial state to handle new fields
                 const mergedState = this.deepMerge(ApplicationStateManager.getInitialState(), persistedState);
-                this.replaceState(mergedState);
-                console.log('📂 Loaded persisted application state');
+                if (this.replaceState) {
+                    this.replaceState(mergedState);
+                    console.log('📂 Loaded persisted application state');
+                } else {
+                    console.warn('⚠️ replaceState method not available');
+                }
             }
         } catch (error) {
             console.error('❌ Error loading persisted state:', error);
@@ -426,6 +435,11 @@ class ApplicationStateManager extends StateManager {
 
     persistState() {
         try {
+            if (!this.storage?.set) {
+                console.log('📂 Storage service not ready, skipping state persistence');
+                return;
+            }
+            
             const currentState = this.getState();
             const stateToPersist = {};
             
@@ -656,9 +670,25 @@ class ApplicationStateManager extends StateManager {
     }
 }
 
-// Create global instance
-const lupoAppState = new ApplicationStateManager();
+// Factory function to create instance when ready
+function createAppStateManager() {
+    if (!window.lupoAppState) {
+        window.lupoAppState = new ApplicationStateManager();
+    }
+    return window.lupoAppState;
+}
 
 // Export for use
 window.ApplicationStateManager = ApplicationStateManager;
-window.lupoAppState = lupoAppState;
+window.createAppStateManager = createAppStateManager;
+
+// Create instance when DOM is ready and services are available
+document.addEventListener('DOMContentLoaded', () => {
+    // Wait a bit for services to load
+    setTimeout(() => {
+        if (window.lupoStorage && window.lupoConfig) {
+            window.lupoAppState = createAppStateManager();
+            console.log('✅ Application State Manager ready');
+        }
+    }, 100);
+});

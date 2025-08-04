@@ -7,9 +7,10 @@ class NotificationService {
         this.config = config;
         this.storage = storage;
         
-        this.timeout = this.config.get('ui.notifications.timeout', 5000);
-        this.maxVisible = this.config.get('ui.notifications.maxVisible', 5);
-        this.position = this.config.get('ui.notifications.position', 'top-right');
+        // Use safe defaults if config service isn't ready
+        this.timeout = config?.get ? config.get('ui.notifications.timeout', 5000) : 5000;
+        this.maxVisible = config?.get ? config.get('ui.notifications.maxVisible', 5) : 5;
+        this.position = config?.get ? config.get('ui.notifications.position', 'top-right') : 'top-right';
         
         this.notifications = [];
         this.container = null;
@@ -441,8 +442,10 @@ class NotificationService {
      * Load stored notifications
      */
     loadStoredNotifications() {
-        const stored = this.storage.get('notifications', []);
-        // Could show critical stored notifications on load if needed
+        if (this.storage?.get) {
+            const stored = this.storage.get('notifications', []);
+            // Could show critical stored notifications on load if needed
+        }
     }
 
     /**

@@ -4,11 +4,11 @@
  */
 class AppManager {
     constructor() {
-        console.log('🚀 Initializing Lupo Trading Platform with Centralized State Management...');
+        console.log('ðŸš€ Initializing Lupo Trading Platform with Centralized State Management...');
         
-        // Core state and synchronization
-        this.appState = window.lupoAppState;
-        this.stateSync = window.lupoStateSync;
+        // Core state and synchronization - initialize if not ready
+        this.appState = window.lupoAppState || window.createAppStateManager?.();
+        this.stateSync = window.lupoStateSync || window.createStateSyncService?.();
         
         // Service instances (will be registered with state sync)
         this.services = {};
@@ -24,30 +24,40 @@ class AppManager {
 
     async init() {
         try {
-            console.log('🔧 Setting up core services...');
+            console.log('ðŸŽ¨ Setting up theme toggle...');
+            this.initializeTheme();
+            
+            console.log('ðŸ”§ Setting up core services...');
             await this.initializeServices();
             
-            console.log('🎨 Setting up UI components...');
-            await this.initializeComponents();
-            
-            console.log('🔗 Setting up state synchronization...');
+            console.log('ðŸ”— Setting up state synchronization...');
             await this.setupStateSynchronization();
             
-            console.log('🔐 Checking authentication...');
+            console.log('ðŸ” Checking authentication...');
             await this.handleAuthentication();
             
-            console.log('📡 Setting up event handlers...');
+            console.log('ðŸ“¡ Setting up event handlers...');
             this.setupEventHandlers();
             
-            console.log('⚡ Setting up performance monitoring...');
+            console.log('âš¡ Setting up performance monitoring...');
             this.setupPerformanceMonitoring();
             
             this.initialized = true;
-            console.log('✅ Lupo Trading Platform initialized successfully');
+            console.log('âœ… Lupo Trading Platform initialized successfully');
             
         } catch (error) {
-            console.error('❌ Failed to initialize application:', error);
+            console.error('âŒ Failed to initialize application:', error);
             this.handleInitializationError(error);
+        }
+    }
+
+    /**
+     * Theme initialization
+     */
+    initializeTheme() {
+        // Initialize ThemeToggle from app.js
+        if (typeof ThemeToggle !== 'undefined') {
+            this.themeToggle = new ThemeToggle();
         }
     }
 
@@ -75,13 +85,16 @@ class AppManager {
             }
         });
 
-        console.log('📋 Registered services:', Object.keys(this.services));
+        console.log('ðŸ“‹ Registered services:', Object.keys(this.services));
     }
 
     /**
      * Component initialization with dependency injection
      */
     async initializeComponents() {
+        // Wait for all global services to be available
+        await this.waitForServices();
+        
         // Components now use global services by default via dependency injection
         this.components = {
             tradeModal: new TradeModal(),
@@ -95,7 +108,37 @@ class AppManager {
         // Setup component communication through state
         this.setupComponentCommunication();
         
-        console.log('🎨 Initialized components:', Object.keys(this.components));
+        console.log('ðŸŽ¨ Initialized components:', Object.keys(this.components));
+    }
+
+    /**
+     * Wait for all required global services to be available
+     */
+    async waitForServices() {
+        const requiredServices = [
+            'lupoConfig', 'lupoStorage', 'lupoApiClient', 'lupoNotifications',
+            'lupoAuth', 'lupoStocks', 'lupoPortfolio', 'lupoRealTime'
+        ];
+        
+        const maxWait = 5000; // 5 seconds
+        const checkInterval = 100; // 100ms
+        let waited = 0;
+        
+        while (waited < maxWait) {
+            const missingServices = requiredServices.filter(service => !window[service]);
+            
+            if (missingServices.length === 0) {
+                console.log('âœ… All services are available');
+                return;
+            }
+            
+            console.log('â³ Waiting for services:', missingServices);
+            await new Promise(resolve => setTimeout(resolve, checkInterval));
+            waited += checkInterval;
+        }
+        
+        console.warn('âš ï¸ Some services may not be ready:', 
+            requiredServices.filter(service => !window[service]));
     }
 
     /**
@@ -118,24 +161,24 @@ class AppManager {
         const authState = this.appState.getAuthState();
         
         if (!authState.isAuthenticated) {
-            console.log('❌ Not authenticated - showing login form');
+            console.log('âŒ Not authenticated - showing login form');
             this.showLoginForm();
             return;
         }
 
-        console.log('✅ User is authenticated - verifying token...');
+        console.log('âœ… User is authenticated - verifying token...');
         
         // Verify token through auth service
         const isValid = await this.services.auth.verifyToken();
         
         if (!isValid) {
-            console.log('❌ Token invalid - showing login form');
+            console.log('âŒ Token invalid - showing login form');
             this.appState.clearAuthenticationState();
             this.showLoginForm();
             return;
         }
 
-        console.log('✅ Authentication verified - initializing authenticated app');
+        console.log('âœ… Authentication verified - initializing authenticated app');
         await this.initializeAuthenticatedApp();
     }
 
@@ -158,7 +201,7 @@ class AppManager {
     }
 
     async initializeAuthenticatedApp() {
-        console.log('🔓 Initializing authenticated application...');
+        console.log('ðŸ”“ Initializing authenticated application...');
         
         // Update UI state
         this.appState.setState({
@@ -185,14 +228,14 @@ class AppManager {
         // Start real-time tracking
         this.startRealTimeTracking();
 
-        console.log('✅ Authenticated application initialized');
+        console.log('âœ… Authenticated application initialized');
     }
 
     /**
      * Data loading with state updates
      */
     async loadInitialData() {
-        console.log('📊 Loading initial application data...');
+        console.log('ðŸ“Š Loading initial application data...');
         
         try {
             // Set loading states
@@ -226,7 +269,7 @@ class AppManager {
             }
 
         } catch (error) {
-            console.error('❌ Error loading initial data:', error);
+            console.error('âŒ Error loading initial data:', error);
             this.services.notifications.error('Loading Error', 'Failed to load application data');
         } finally {
             // Clear loading states
@@ -256,12 +299,19 @@ class AppManager {
     }
 
     setupLoginFormHandlers() {
+        console.log('ðŸ”§ Setting up login form handlers...');
         const loginForm = document.getElementById('login-form');
+        console.log('ðŸ“‹ Login form found:', !!loginForm);
+        
         if (loginForm) {
+            console.log('âœ… Adding submit event listener to login form');
             loginForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
+                console.log('ðŸ”¥ Form submit event triggered!');
                 await this.handleLogin(e);
             });
+        } else {
+            console.error('âŒ Login form not found! Available forms:', document.querySelectorAll('form'));
         }
 
         const registerForm = document.getElementById('register-form');
@@ -274,22 +324,36 @@ class AppManager {
     }
 
     async handleLogin(e) {
+        console.log('ðŸ” Login form submitted', e);
+        
         const formData = new FormData(e.target);
         const email = formData.get('email');
         const password = formData.get('password');
         const rememberMe = formData.get('remember-me');
 
+        console.log('ðŸ“§ Login data:', { email, password: '***', rememberMe });
+
         this.appState.setLoadingState('auth', true);
 
         try {
+            console.log('ðŸš€ Calling auth service login...');
             const result = await this.services.auth.login(email, password, rememberMe);
+            console.log('âœ… Login successful:', result);
+            
+            // Check if token was stored properly
+            const storedToken = this.services.auth.getAuthToken();
+            console.log('ðŸ”‘ Stored token:', storedToken ? 'Present' : 'Missing');
+            
+            // Check if API client has the token
+            const apiToken = this.services.apiClient.getAuthToken();
+            console.log('ðŸŒ API client token:', apiToken ? 'Present' : 'Missing');
             
             // State will be updated through auth service events
             await this.initializeAuthenticatedApp();
             
         } catch (error) {
-            console.error('Login failed:', error);
-            this.services.notifications.error('Login Failed', error.message);
+            console.error('âŒ Login failed:', error);
+            this.services.notifications?.error('Login Failed', error.message);
         } finally {
             this.appState.setLoadingState('auth', false);
         }
@@ -472,7 +536,7 @@ class AppManager {
             
             if (updateCount % 100 === 0) {
                 const avgTime = (Date.now() - startTime) / updateCount;
-                console.log(`📊 State Performance: ${updateCount} updates, avg ${avgTime.toFixed(2)}ms`);
+                console.log(`ðŸ“Š State Performance: ${updateCount} updates, avg ${avgTime.toFixed(2)}ms`);
             }
         });
 
@@ -481,7 +545,7 @@ class AppManager {
             setInterval(() => {
                 const memory = window.performance.memory;
                 if (memory.usedJSHeapSize > 50 * 1024 * 1024) { // 50MB
-                    console.warn('⚠️ High memory usage detected:', {
+                    console.warn('âš ï¸ High memory usage detected:', {
                         used: Math.round(memory.usedJSHeapSize / 1024 / 1024) + 'MB',
                         total: Math.round(memory.totalJSHeapSize / 1024 / 1024) + 'MB'
                     });
@@ -595,7 +659,7 @@ class AppManager {
      * Application lifecycle
      */
     async restart() {
-        console.log('🔄 Restarting application...');
+        console.log('ðŸ”„ Restarting application...');
         
         await this.destroy();
         await this.init();
@@ -604,7 +668,7 @@ class AppManager {
     async destroy() {
         if (this.destroyed) return;
         
-        console.log('🗑️ Destroying application...');
+        console.log('ðŸ—‘ï¸ Destroying application...');
         
         // Destroy components
         Object.values(this.components).forEach(component => {
@@ -623,7 +687,7 @@ class AppManager {
         }
 
         this.destroyed = true;
-        console.log('✅ Application destroyed');
+        console.log('âœ… Application destroyed');
     }
 
     /**
@@ -655,7 +719,7 @@ class AppManager {
 
     enableDebugMode() {
         this.appState.enableDebugMode();
-        console.log('🐛 Debug mode enabled');
+        console.log('ðŸ› Debug mode enabled');
     }
 }
 
@@ -667,3 +731,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Export for use
 window.AppManager = AppManager;
+
