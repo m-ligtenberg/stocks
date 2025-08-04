@@ -1,0 +1,159 @@
+/* CSS Custom Properties - Design System Variables */
+:root {
+  /* Primitive Color Tokens */
+  --color-white: rgba(255, 255, 255, 1);
+  --color-black: rgba(0, 0, 0, 1);
+  --color-cream-50: rgba(252, 252, 249, 1);
+  --color-cream-100: rgba(255, 255, 253, 1);
+  --color-gray-200: rgba(245, 245, 245, 1);
+  --color-gray-300: rgba(167, 169, 169, 1);
+  --color-gray-400: rgba(119, 124, 124, 1);
+  --color-slate-500: rgba(98, 108, 113, 1);
+  --color-brown-600: rgba(94, 82, 64, 1);
+  --color-charcoal-700: rgba(31, 33, 33, 1);
+  --color-charcoal-800: rgba(38, 40, 40, 1);
+  --color-slate-900: rgba(19, 52, 59, 1);
+  --color-teal-300: rgba(50, 184, 198, 1);
+  --color-teal-400: rgba(45, 166, 178, 1);
+  --color-teal-500: rgba(33, 128, 141, 1);
+  --color-teal-600: rgba(29, 116, 128, 1);
+  --color-teal-700: rgba(26, 104, 115, 1);
+  --color-teal-800: rgba(41, 150, 161, 1);
+  --color-red-400: rgba(255, 84, 89, 1);
+  --color-red-500: rgba(192, 21, 47, 1);
+  --color-orange-400: rgba(230, 129, 97, 1);
+  --color-orange-500: rgba(168, 75, 47, 1);
+
+  /* RGB versions for opacity control */
+  --color-brown-600-rgb: 94, 82, 64;
+  --color-teal-500-rgb: 33, 128, 141;
+  --color-slate-900-rgb: 19, 52, 59;
+  --color-slate-500-rgb: 98, 108, 113;
+  --color-red-500-rgb: 192, 21, 47;
+  --color-red-400-rgb: 255, 84, 89;
+  --color-orange-500-rgb: 168, 75, 47;
+  --color-orange-400-rgb: 230, 129, 97;
+  --color-cream-50-rgb: 252, 252, 249;
+  --color-primary-rgb: 33, 128, 141;
+
+  /* Background color tokens (Light Mode) */
+  --color-bg-1: rgba(59, 130, 246, 0.08);
+  --color-bg-2: rgba(245, 158, 11, 0.08);
+  --color-bg-3: rgba(34, 197, 94, 0.08);
+  --color-bg-4: rgba(239, 68, 68, 0.08);
+  --color-bg-5: rgba(147, 51, 234, 0.08);
+  --color-bg-6: rgba(249, 115, 22, 0.08);
+  --color-bg-7: rgba(236, 72, 153, 0.08);
+  --color-bg-8: rgba(6, 182, 212, 0.08);
+
+  /* Semantic Color Tokens (Light Mode) */
+  --color-background: var(--color-cream-50);
+  --color-surface: var(--color-cream-100);
+  --color-text: var(--color-slate-900);
+  --color-text-secondary: var(--color-slate-500);
+  --color-border: var(--color-gray-200);
+  --color-primary: var(--color-teal-500);
+  --color-primary-hover: var(--color-teal-600);
+  --color-secondary: var(--color-brown-600);
+  --color-accent: var(--color-orange-400);
+  --color-success: var(--color-teal-400);
+  --color-warning: var(--color-orange-400);
+  --color-error: var(--color-red-400);
+  --color-info: var(--color-slate-500);
+
+  /* Professional Trading Theme Colors */
+  --color-professional-bg: #0A0B0F;
+  --color-professional-surface: #1A1D26;
+  --color-professional-dark: #13161F;
+  --color-professional-border: rgba(245, 158, 11, 0.2);
+  --color-professional-text: #E8EBF3;
+  --color-professional-text-secondary: #9CA3AF;
+  --color-professional-primary: #F59E0B;
+  --color-professional-secondary: #FBBF24;
+  --color-professional-accent: #10B981;
+  --color-professional-danger: #EF4444;
+
+  /* Typography */
+  --font-family-base: "FKGroteskNeue", "Geist", "Inter", -apple-system,
+    BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-family-mono: "Berkeley Mono", ui-monospace, SFMono-Regular, Menlo,
+    Monaco, Consolas, monospace;
+  --font-size-xs: clamp(0.69rem, 0.66rem + 0.13vw, 0.75rem);
+  --font-size-sm: clamp(0.75rem, 0.71rem + 0.19vw, 0.88rem);
+  --font-size-base: clamp(0.88rem, 0.83rem + 0.23vw, 1rem);
+  --font-size-md: clamp(0.88rem, 0.83rem + 0.23vw, 1rem);
+  --font-size-lg: clamp(1rem, 0.93rem + 0.38vw, 1.25rem);
+  --font-size-xl: clamp(1.13rem, 1.03rem + 0.47vw, 1.44rem);
+  --font-size-2xl: clamp(1.25rem, 1.13rem + 0.63vw, 1.69rem);
+  --font-size-3xl: clamp(1.5rem, 1.34rem + 0.81vw, 2.06rem);
+  --font-size-4xl: clamp(1.88rem, 1.63rem + 1.25vw, 2.75rem);
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 550;
+  --font-weight-bold: 600;
+  --line-height-tight: 1.25;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.6;
+  --letter-spacing-tight: -0.01em;
+
+  /* Spacing */
+  --space-0: 0;
+  --space-1: 1px;
+  --space-2: 2px;
+  --space-4: clamp(0.25rem, 0.23rem + 0.09vw, 0.31rem);
+  --space-6: clamp(0.38rem, 0.34rem + 0.19vw, 0.5rem);
+  --space-8: clamp(0.5rem, 0.45rem + 0.23vw, 0.63rem);
+  --space-10: clamp(0.63rem, 0.56rem + 0.33vw, 0.81rem);
+  --space-12: clamp(0.75rem, 0.68rem + 0.38vw, 1rem);
+  --space-16: clamp(1rem, 0.91rem + 0.47vw, 1.25rem);
+  --space-20: clamp(1.25rem, 1.13rem + 0.63vw, 1.69rem);
+  --space-24: clamp(1.5rem, 1.34rem + 0.81vw, 2.06rem);
+  --space-32: clamp(2rem, 1.77rem + 1.17vw, 2.75rem);
+
+  /* Border Radius */
+  --radius-sm: 6px;
+  --radius-base: 8px;
+  --radius-md: 10px;
+  --radius-lg: 12px;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.02);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.04),
+    0 2px 4px -1px rgba(0, 0, 0, 0.02);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.06),
+    0 4px 6px -2px rgba(0, 0, 0, 0.02);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.08),
+    0 10px 10px -5px rgba(0, 0, 0, 0.02);
+  --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.15),
+    0 0 0 1px rgba(0, 0, 0, 0.05);
+
+  /* Container Sizes - Fixed conflicts */
+  --container-sm: 640px;
+  --container-md: 768px;
+  --container-lg: 1024px;
+  --container-xl: 1280px;
+  --container-2xl: 1536px;
+
+  /* Animation */
+  --duration-fast: 0.15s;
+  --duration-normal: 0.25s;
+  --duration-slow: 0.5s;
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+}
+
+/* Dark mode overrides */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-background: var(--color-professional-bg);
+    --color-surface: var(--color-professional-surface);
+    --color-text: var(--color-professional-text);
+    --color-text-secondary: var(--color-professional-text-secondary);
+    --color-border: var(--color-professional-border);
+    --color-primary: var(--color-professional-primary);
+    --color-secondary: var(--color-professional-secondary);
+  }
+}

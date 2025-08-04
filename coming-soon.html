@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <title>Lupo - Coming Soon</title>
+    <link rel="stylesheet" href="styles/variables.css">
+    <link rel="stylesheet" href="styles/base.css">
+    <link rel="stylesheet" href="styles/layout.css">
+    <link rel="stylesheet" href="styles/breakpoints.css">
+    <link rel="stylesheet" href="styles/utilities.css">
+    <link rel="stylesheet" href="styles/touch.css">
+    <link rel="stylesheet" href="styles/coming-soon.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Coming Soon Landing Page -->
+    <div id="coming-soon-page" class="coming-soon-container">
+        <div class="coming-soon-background"></div>
+        
+        <div class="coming-soon-content">
+            <div class="coming-soon-card">
+                <!-- Header -->
+                <div class="coming-soon-header">
+                    <h1 class="coming-soon-brand">
+                        <span class="brand-main">Lupo</span><span class="brand-domain">.uno</span>
+                    </h1>
+                    <p class="coming-soon-tagline">Professional Trading Platform</p>
+                    <p class="coming-soon-subtitle">Transparent. Independent. Retail-Focused.</p>
+                </div>
+
+                <!-- Coming Soon Message -->
+                <div class="coming-soon-message">
+                    <h2>🚀 Coming Soon</h2>
+                    <p>We're building the future of retail trading. Lupo will provide institutional-grade market intelligence, transparent data, and powerful tools designed specifically for retail investors.</p>
+                </div>
+
+
+                <!-- Launch Timeline -->
+                <div class="launch-timeline">
+                    <h3>Launch Timeline</h3>
+                    <div class="timeline-item completed">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-content">
+                            <h4>Phase 1: Core Platform ✅</h4>
+                            <p>Basic trading simulation and market data integration</p>
+                        </div>
+                    </div>
+                    <div class="timeline-item in-progress">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-content">
+                            <h4>Phase 2: Advanced Features 🔄</h4>
+                            <p>Institutional transparency and market alerts</p>
+                        </div>
+                    </div>
+                    <div class="timeline-item upcoming">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-content">
+                            <h4>Phase 3: Public Launch 🚀</h4>
+                            <p>Full platform release with all features</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Admin Access -->
+                <div class="admin-access">
+                    <button id="admin-login-btn" class="btn btn-secondary">Admin Access</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Login Modal -->
+    <div id="admin-login-modal" class="modal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content admin-modal">
+            <div class="modal-header">
+                <h2>Admin Login</h2>
+                <button class="close-modal" id="close-admin-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="admin-login-form" class="login-form">
+                    <div class="form-group">
+                        <label for="admin-email" class="form-label">Admin Email</label>
+                        <input 
+                            type="email" 
+                            id="admin-email" 
+                            class="form-control" 
+                            placeholder="admin@lupo.com"
+                        >
+                    </div>
+                    <div class="form-group">
+                        <label for="admin-password" class="form-label">Admin Password</label>
+                        <input 
+                            type="password" 
+                            id="admin-password" 
+                            class="form-control" 
+                            placeholder="Enter admin password"
+                        >
+                    </div>
+                    <button type="submit" id="admin-login-submit" class="btn btn-primary">
+                        🔐 Admin Login
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main App (Hidden by default) -->
+    <div id="main-app" class="hidden">
+        <!-- This will contain the full Lupo platform -->
+        <div class="main-header">
+            <div class="container">
+                <div class="header-content">
+                    <div class="brand-section">
+                        <h1 class="brand-title">Lupo</h1>
+                        <p class="brand-tagline">Professional Trading Platform</p>
+                    </div>
+                    <div class="header-stats">
+                        <div class="stat-item">
+                            <span class="stat-label">Platform Status</span>
+                            <span class="stat-value">Admin Mode</span>
+                        </div>
+                        <div class="stat-item">
+                            <button id="admin-logout-btn" class="btn btn-outline">Logout</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <nav class="main-nav">
+            <div class="container">
+                <div class="nav-tabs">
+                    <button class="nav-tab active" data-tab="admin-dashboard">Admin Dashboard</button>
+                    <button class="nav-tab" data-tab="platform-preview">Platform Preview</button>
+                    <button class="nav-tab" data-tab="user-management">User Management</button>
+                    <button class="nav-tab" data-tab="system-settings">Settings</button>
+                </div>
+            </div>
+        </nav>
+
+        <main class="main-content">
+            <div class="container">
+                <section id="admin-dashboard" class="content-tab active">
+                    <h2 class="tab-title">Admin Dashboard</h2>
+                    <div class="admin-stats-grid">
+                        <div class="admin-stat-card">
+                            <h3>Platform Status</h3>
+                            <div class="status-indicator">
+                                <span class="status-dot development"></span>
+                                <span>Development Mode</span>
+                            </div>
+                        </div>
+                        <div class="admin-stat-card">
+                            <h3>API Health</h3>
+                            <div class="status-indicator">
+                                <span class="status-dot active"></span>
+                                <span>All Systems Online</span>
+                            </div>
+                        </div>
+                        <div class="admin-stat-card">
+                            <h3>Database</h3>
+                            <div class="status-indicator">
+                                <span class="status-dot active"></span>
+                                <span>Connected</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="platform-preview" class="content-tab">
+                    <h2 class="tab-title">Platform Preview</h2>
+                    <p>Preview of the full Lupo platform features will be displayed here.</p>
+                </section>
+
+                <section id="user-management" class="content-tab">
+                    <h2 class="tab-title">User Management</h2>
+                    <p>User management tools will be available here.</p>
+                </section>
+
+                <section id="system-settings" class="content-tab">
+                    <h2 class="tab-title">System Settings</h2>
+                    <p>System configuration options will be available here.</p>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <script src="coming-soon.js"></script>
+</body>
+</html>

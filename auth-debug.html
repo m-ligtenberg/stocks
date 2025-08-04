@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Auth Debug</title>
+</head>
+<body>
+    <h1>Authentication Debug</h1>
+    <button onclick="checkAuth()">Check Auth State</button>
+    <button onclick="clearAuth()">Clear Auth</button>
+    <button onclick="testLogin()">Test Login</button>
+    
+    <div id="debug-output"></div>
+    
+    <script>
+        function checkAuth() {
+            const token = localStorage.getItem('lupo-auth-token');
+            const user = localStorage.getItem('lupo-user');
+            
+            document.getElementById('debug-output').innerHTML = `
+                <h3>Auth Status:</h3>
+                <p><strong>Token exists:</strong> ${!!token}</p>
+                <p><strong>Token:</strong> ${token ? token.substring(0, 50) + '...' : 'null'}</p>
+                <p><strong>User exists:</strong> ${!!user}</p>
+                <p><strong>User:</strong> ${user || 'null'}</p>
+                <p><strong>isAuthenticated:</strong> ${!!token}</p>
+            `;
+        }
+        
+        function clearAuth() {
+            localStorage.removeItem('lupo-auth-token');
+            localStorage.removeItem('lupo-user');
+            document.getElementById('debug-output').innerHTML = '<p>Auth cleared!</p>';
+        }
+        
+        async function testLogin() {
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: 'demo@lupo.com', password: 'demo123' })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success && result.data) {
+                    localStorage.setItem('lupo-auth-token', result.data.token);
+                    localStorage.setItem('lupo-user', JSON.stringify(result.data.user));
+                    document.getElementById('debug-output').innerHTML = '<p>Login successful, tokens stored!</p>';
+                }
+            } catch (error) {
+                document.getElementById('debug-output').innerHTML = `<p>Login failed: ${error.message}</p>`;
+            }
+        }
+        
+        // Auto-check on load
+        window.onload = checkAuth;
+    </script>
+</body>
+</html>

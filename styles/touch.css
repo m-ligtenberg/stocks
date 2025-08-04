@@ -1,0 +1,327 @@
+/* Touch Interaction Optimizations
+ * Global improvements for mobile and touch devices
+ */
+
+/* Touch-friendly tap targets - minimum 44px */
+button,
+.btn,
+.nav-tab,
+.modal-tab,
+.stock-card,
+.institution-card,
+.education-card,
+.intelligence-card,
+a[role="button"],
+input[type="button"],
+input[type="submit"],
+input[type="reset"],
+select,
+input[type="checkbox"],
+input[type="radio"] {
+  min-height: 44px;
+  min-width: 44px;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: rgba(245, 158, 11, 0.3);
+}
+
+/* Enhanced touch targets for interactive elements */
+.stock-card,
+.institution-card,
+.education-card,
+.intelligence-card {
+  min-height: 120px;
+  cursor: pointer;
+  transition: transform var(--duration-fast) var(--ease-out),
+              box-shadow var(--duration-fast) var(--ease-out);
+}
+
+/* Touch feedback - subtle scale and shadow on tap */
+.stock-card:active,
+.institution-card:active,
+.education-card:active,
+.intelligence-card:active,
+.btn:active,
+.nav-tab:active {
+  transform: scale(0.98);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Smooth hover states that work on touch */
+@media (hover: hover) {
+  .stock-card:hover,
+  .institution-card:hover,
+  .education-card:hover,
+  .intelligence-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+  }
+  
+  .btn:hover,
+  .nav-tab:hover {
+    transform: translateY(-1px);
+  }
+}
+
+/* Touch scroll improvements */
+.modal-content,
+.table-responsive,
+.nav-tabs,
+.opportunities-grid,
+.stocks-grid,
+.intelligence-grid,
+.transparency-grid,
+.education-grid {
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
+/* Prevent text selection on interactive elements */
+.btn,
+.nav-tab,
+.modal-tab,
+.stock-card,
+.institution-card,
+.education-card,
+.intelligence-card,
+.brand-title {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* Allow text selection in content areas */
+.stock-info,
+.stock-description,
+.modal-body,
+.education-content,
+.institution-details,
+p,
+.text-content {
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
+}
+
+/* Touch-friendly form controls */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="search"],
+input[type="number"],
+textarea,
+select {
+  min-height: 44px;
+  padding: var(--space-12) var(--space-16);
+  border-radius: var(--radius-base);
+  border: 2px solid var(--color-border);
+  transition: border-color var(--duration-normal) var(--ease-standard),
+              box-shadow var(--duration-normal) var(--ease-standard);
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="search"]:focus,
+input[type="number"]:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2);
+}
+
+/* Enhanced checkbox and radio buttons */
+input[type="checkbox"],
+input[type="radio"] {
+  min-width: 20px;
+  min-height: 20px;
+  margin: var(--space-4);
+}
+
+/* Touch-friendly navigation */
+.nav-tabs {
+  gap: var(--space-4);
+  padding: var(--space-8);
+}
+
+.nav-tab {
+  padding: var(--space-12) var(--space-16);
+  border-radius: var(--radius-base);
+  transition: all var(--duration-normal) var(--ease-standard);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Ripple effect for touch feedback */
+.nav-tab::before,
+.btn::before,
+.stock-card::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  transform: translate(-50%, -50%);
+  transition: width var(--duration-fast) var(--ease-out),
+              height var(--duration-fast) var(--ease-out);
+  pointer-events: none;
+}
+
+.nav-tab:active::before,
+.btn:active::before,
+.stock-card:active::before {
+  width: 200px;
+  height: 200px;
+}
+
+/* Prevent zoom on iOS for form inputs */
+@media screen and (max-width: 768px) {
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="search"],
+  input[type="number"],
+  textarea,
+  select {
+    font-size: 16px;
+  }
+}
+
+/* Touch-friendly modal interactions */
+.modal-overlay {
+  touch-action: none;
+}
+
+.modal-content {
+  touch-action: pan-y;
+  overscroll-behavior: contain;
+}
+
+/* Swipe gesture preparations */
+.modal-tabs,
+.nav-tabs {
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.modal-tabs::-webkit-scrollbar,
+.nav-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.modal-tab,
+.nav-tab {
+  scroll-snap-align: start;
+  flex-shrink: 0;
+}
+
+/* Touch-friendly dropdown menus */
+.dropdown,
+.select-wrapper {
+  position: relative;
+}
+
+.dropdown-menu {
+  min-width: 200px;
+  max-height: 300px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: var(--radius-base);
+  box-shadow: var(--shadow-lg);
+}
+
+.dropdown-item {
+  min-height: 44px;
+  padding: var(--space-12) var(--space-16);
+  display: flex;
+  align-items: center;
+  transition: background-color var(--duration-fast) var(--ease-standard);
+}
+
+.dropdown-item:active {
+  background-color: rgba(245, 158, 11, 0.1);
+}
+
+/* Touch-friendly table interactions */
+.table-responsive {
+  position: relative;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+
+.table-responsive table {
+  min-width: 600px;
+}
+
+.table-responsive tbody tr {
+  min-height: 56px;
+}
+
+.table-responsive td,
+.table-responsive th {
+  padding: var(--space-12) var(--space-16);
+  min-width: 120px;
+}
+
+/* Touch indicators for scrollable content */
+.table-responsive::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 20px;
+  background: linear-gradient(to left, rgba(0,0,0,0.1), transparent);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--duration-normal) var(--ease-standard);
+}
+
+.table-responsive:hover::after {
+  opacity: 1;
+}
+
+/* Accessibility improvements for touch */
+@media (prefers-reduced-motion: reduce) {
+  .stock-card,
+  .btn,
+  .nav-tab,
+  input,
+  textarea,
+  select {
+    transition: none;
+  }
+  
+  .stock-card:active,
+  .btn:active,
+  .nav-tab:active {
+    transform: none;
+  }
+}
+
+/* Dark mode touch feedback adjustments */
+@media (prefers-color-scheme: dark) {
+  button,
+  .btn,
+  .nav-tab,
+  .modal-tab,
+  .stock-card,
+  .institution-card,
+  .education-card,
+  .intelligence-card {
+    -webkit-tap-highlight-color: rgba(245, 158, 11, 0.2);
+  }
+  
+  .nav-tab::before,
+  .btn::before,
+  .stock-card::before {
+    background: rgba(245, 158, 11, 0.1);
+  }
+}

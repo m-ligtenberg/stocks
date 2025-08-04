@@ -1,0 +1,12 @@
+RewriteEngine On
+
+# Redirect root to coming-soon page
+RewriteRule ^$ coming-soon.html [L]
+
+# Optional: Also redirect index.html to coming-soon.html
+# RewriteRule ^index\.html$ coming-soon.html [R=301,L]
+
+# Handle API routes
+RewriteRule ^api/auth/(.*)$ api/auth.php [L,QSA]
+RewriteRule ^api/stocks/(.*)$ api/stocks.php [L,QSA]
+RewriteRule ^api/user/(.*)$ api/user.php [L,QSA]

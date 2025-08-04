@@ -1,0 +1,220 @@
+[Mon Aug  4 09:03:30 2025] PHP 8.2.28 Development Server (http://localhost:8001) started
+[Mon Aug  4 09:03:37 2025] [::1]:55890 Accepted
+[Mon Aug  4 09:03:37 2025] [::1]:55890 Closing
+[Mon Aug  4 09:03:50 2025] [::1]:40332 Accepted
+[Mon Aug  4 09:03:50 2025] [::1]:40332 Closing
+[Mon Aug  4 09:05:01 2025] [::1]:38644 Accepted
+[Mon Aug  4 09:05:01 2025] [::1]:38644 Closing
+[Mon Aug  4 09:05:09 2025] [::1]:33976 Accepted
+[Mon Aug  4 09:05:09 2025] [::1]:33976 Closing
+[Mon Aug  4 09:05:40 2025] [::1]:56378 Accepted
+[Mon Aug  4 09:05:40 2025] [::1]:56378 Closing
+[Mon Aug  4 09:05:40 2025] [::1]:56394 Accepted
+[Mon Aug  4 09:05:40 2025] [::1]:56394 [200]: GET /styles/variables.css
+[Mon Aug  4 09:05:40 2025] [::1]:56402 Accepted
+[Mon Aug  4 09:05:40 2025] [::1]:56394 Closing
+[Mon Aug  4 09:05:40 2025] [::1]:56402 [200]: GET /styles/base.css
+[Mon Aug  4 09:05:40 2025] [::1]:56402 Closing
+[Mon Aug  4 09:05:40 2025] [::1]:56408 Accepted
+[Mon Aug  4 09:05:40 2025] [::1]:56408 [200]: GET /styles/layout.css
+[Mon Aug  4 09:05:40 2025] [::1]:56408 Closing
+[Mon Aug  4 09:05:40 2025] [::1]:56420 Accepted
+[Mon Aug  4 09:05:40 2025] [::1]:56430 Accepted
+[Mon Aug  4 09:05:40 2025] [::1]:56440 Accepted
+[Mon Aug  4 09:05:40 2025] [::1]:56430 [200]: GET /styles/utilities.css
+[Mon Aug  4 09:05:40 2025] [::1]:56430 Closing
+[Mon Aug  4 09:05:40 2025] [::1]:56420 [200]: GET /styles/touch.css
+[Mon Aug  4 09:05:40 2025] [::1]:56420 Closing
+[Mon Aug  4 09:05:40 2025] [::1]:56440 [200]: GET /styles/breakpoints.css
+[Mon Aug  4 09:05:40 2025] [::1]:56440 Closing
+[Mon Aug  4 09:05:40 2025] [::1]:56456 Accepted
+[Mon Aug  4 09:05:40 2025] [::1]:56456 [200]: GET /style.css
+[Mon Aug  4 09:05:40 2025] [::1]:56456 Closing
+[Mon Aug  4 09:05:40 2025] [::1]:56462 Accepted
+[Mon Aug  4 09:05:40 2025] [::1]:56462 [200]: GET /app.js
+[Mon Aug  4 09:05:40 2025] [::1]:56462 Closing
+[Mon Aug  4 09:05:41 2025] [::1]:56468 Accepted
+[Mon Aug  4 09:05:41 2025] [::1]:56468 Closing
+[Mon Aug  4 09:05:49 2025] [::1]:57220 Accepted
+[Mon Aug  4 09:05:49 2025] [::1]:57220 Closing
+[Mon Aug  4 09:10:22 2025] [::1]:35616 Accepted
+[Mon Aug  4 09:10:23 2025] [::1]:35616 Closed without sending a request; it was probably just an unused speculative preconnection
+[Mon Aug  4 09:10:23 2025] [::1]:35616 Closing
+[Mon Aug  4 09:10:23 2025] [::1]:35628 Accepted
+[Mon Aug  4 09:10:23 2025] [::1]:35628 Closing
+[Mon Aug  4 09:10:23 2025] [::1]:35634 Accepted
+[Mon Aug  4 09:10:23 2025] [::1]:35634 [200]: GET /styles/variables.css
+[Mon Aug  4 09:10:23 2025] [::1]:35634 Closing
+[Mon Aug  4 09:10:23 2025] [::1]:35636 Accepted
+[Mon Aug  4 09:10:23 2025] [::1]:35636 [200]: GET /styles/base.css
+[Mon Aug  4 09:10:23 2025] [::1]:35636 Closing
+[Mon Aug  4 09:10:23 2025] [::1]:35638 Accepted
+[Mon Aug  4 09:10:23 2025] [::1]:35638 [200]: GET /styles/layout.css
+[Mon Aug  4 09:10:23 2025] [::1]:35638 Closing
+[Mon Aug  4 09:10:23 2025] [::1]:35650 Accepted
+[Mon Aug  4 09:10:23 2025] [::1]:35656 Accepted
+[Mon Aug  4 09:10:23 2025] [::1]:35650 [200]: GET /styles/breakpoints.css
+[Mon Aug  4 09:10:23 2025] [::1]:35666 Accepted
+[Mon Aug  4 09:10:23 2025] [::1]:35656 [200]: GET /styles/utilities.css
+[Mon Aug  4 09:10:23 2025] [::1]:35650 Closing
+[Mon Aug  4 09:10:23 2025] [::1]:35656 Closing
+[Mon Aug  4 09:10:23 2025] [::1]:35666 [200]: GET /styles/touch.css
+[Mon Aug  4 09:10:23 2025] [::1]:35666 Closing
+[Mon Aug  4 09:10:23 2025] [::1]:35676 Accepted
+[Mon Aug  4 09:10:23 2025] [::1]:35676 [200]: GET /style.css
+[Mon Aug  4 09:10:23 2025] [::1]:35676 Closing
+[Mon Aug  4 09:10:23 2025] [::1]:35678 Accepted
+[Mon Aug  4 09:10:23 2025] [::1]:35678 [200]: GET /app.js
+[Mon Aug  4 09:10:23 2025] [::1]:35678 Closing
+[Mon Aug  4 09:10:23 2025] [::1]:35692 Accepted
+[Mon Aug  4 09:10:23 2025] [::1]:35692 Closing
+[Mon Aug  4 09:10:23 2025] [::1]:35708 Accepted
+[Mon Aug  4 09:10:23 2025] [::1]:35708 Closing
+[Mon Aug  4 09:11:42 2025] [::1]:50504 Accepted
+[Mon Aug  4 09:11:44 2025] [::1]:50504 Closing
+[Mon Aug  4 09:11:44 2025] [::1]:50510 Accepted
+[Mon Aug  4 09:11:44 2025] [::1]:50510 [200]: GET /styles/variables.css
+[Mon Aug  4 09:11:44 2025] [::1]:50510 Closing
+[Mon Aug  4 09:11:44 2025] [::1]:50524 Accepted
+[Mon Aug  4 09:11:44 2025] [::1]:50524 [200]: GET /styles/base.css
+[Mon Aug  4 09:11:44 2025] [::1]:50524 Closing
+[Mon Aug  4 09:11:44 2025] [::1]:50532 Accepted
+[Mon Aug  4 09:11:44 2025] [::1]:50546 Accepted
+[Mon Aug  4 09:11:44 2025] [::1]:50560 Accepted
+[Mon Aug  4 09:11:44 2025] [::1]:50532 [200]: GET /styles/layout.css
+[Mon Aug  4 09:11:44 2025] [::1]:50532 Closing
+[Mon Aug  4 09:11:44 2025] [::1]:50560 [200]: GET /styles/utilities.css
+[Mon Aug  4 09:11:44 2025] [::1]:50546 [200]: GET /styles/breakpoints.css
+[Mon Aug  4 09:11:44 2025] [::1]:50560 Closing
+[Mon Aug  4 09:11:44 2025] [::1]:50546 Closing
+[Mon Aug  4 09:11:44 2025] [::1]:50566 Accepted
+[Mon Aug  4 09:11:44 2025] [::1]:50566 [200]: GET /styles/touch.css
+[Mon Aug  4 09:11:44 2025] [::1]:50566 Closing
+[Mon Aug  4 09:11:44 2025] [::1]:50568 Accepted
+[Mon Aug  4 09:11:44 2025] [::1]:50568 [200]: GET /style.css
+[Mon Aug  4 09:11:44 2025] [::1]:50568 Closing
+[Mon Aug  4 09:11:44 2025] [::1]:50582 Accepted
+[Mon Aug  4 09:11:44 2025] [::1]:50582 [200]: GET /app.js
+[Mon Aug  4 09:11:44 2025] [::1]:50582 Closing
+[Mon Aug  4 09:11:44 2025] [::1]:50592 Accepted
+[Mon Aug  4 09:11:44 2025] [::1]:50592 Closing
+[Mon Aug  4 09:11:44 2025] [::1]:50596 Accepted
+[Mon Aug  4 09:11:44 2025] [::1]:50596 [200]: GET /styles/variables.css
+[Mon Aug  4 09:11:44 2025] [::1]:50596 Closing
+[Mon Aug  4 09:11:44 2025] [::1]:50612 Accepted
+[Mon Aug  4 09:11:44 2025] [::1]:50618 Accepted
+[Mon Aug  4 09:11:44 2025] [::1]:50632 Accepted
+[Mon Aug  4 09:11:44 2025] [::1]:50618 [200]: GET /styles/base.css
+[Mon Aug  4 09:11:44 2025] [::1]:50634 Accepted
+[Mon Aug  4 09:11:44 2025] [::1]:50612 [200]: GET /styles/layout.css
+[Mon Aug  4 09:11:44 2025] [::1]:50632 [200]: GET /styles/breakpoints.css
+[Mon Aug  4 09:11:44 2025] [::1]:50640 Accepted
+[Mon Aug  4 09:11:44 2025] [::1]:50618 Closing
+[Mon Aug  4 09:11:44 2025] [::1]:50612 Closing
+[Mon Aug  4 09:11:44 2025] [::1]:50632 Closing
+[Mon Aug  4 09:11:44 2025] [::1]:50634 [200]: GET /styles/utilities.css
+[Mon Aug  4 09:11:44 2025] [::1]:50634 Closing
+[Mon Aug  4 09:11:44 2025] [::1]:50640 [200]: GET /styles/touch.css
+[Mon Aug  4 09:11:44 2025] [::1]:50640 Closing
+[Mon Aug  4 09:11:44 2025] [::1]:50648 Accepted
+[Mon Aug  4 09:11:44 2025] [::1]:50652 Accepted
+[Mon Aug  4 09:11:44 2025] [::1]:50648 [200]: GET /style.css
+[Mon Aug  4 09:11:44 2025] [::1]:50652 [200]: GET /app.js
+[Mon Aug  4 09:11:44 2025] [::1]:50648 Closing
+[Mon Aug  4 09:11:44 2025] [::1]:50652 Closing
+[Mon Aug  4 09:11:49 2025] [::1]:52112 Accepted
+[Mon Aug  4 09:11:49 2025] [::1]:52112 Closing
+[Mon Aug  4 09:14:37 2025] [::1]:48124 Accepted
+[Mon Aug  4 09:14:38 2025] [::1]:48124 Closing
+[Mon Aug  4 09:14:38 2025] [::1]:48140 Accepted
+[Mon Aug  4 09:14:38 2025] [::1]:48140 [200]: GET /styles/variables.css
+[Mon Aug  4 09:14:38 2025] [::1]:48140 Closing
+[Mon Aug  4 09:14:38 2025] [::1]:48152 Accepted
+[Mon Aug  4 09:14:38 2025] [::1]:48152 [200]: GET /styles/base.css
+[Mon Aug  4 09:14:38 2025] [::1]:48152 Closing
+[Mon Aug  4 09:14:38 2025] [::1]:48168 Accepted
+[Mon Aug  4 09:14:38 2025] [::1]:48168 [200]: GET /styles/layout.css
+[Mon Aug  4 09:14:38 2025] [::1]:48168 Closing
+[Mon Aug  4 09:14:38 2025] [::1]:48176 Accepted
+[Mon Aug  4 09:14:38 2025] [::1]:48176 [200]: GET /styles/utilities.css
+[Mon Aug  4 09:14:38 2025] [::1]:48176 Closing
+[Mon Aug  4 09:14:38 2025] [::1]:48186 Accepted
+[Mon Aug  4 09:14:38 2025] [::1]:48186 [200]: GET /styles/breakpoints.css
+[Mon Aug  4 09:14:38 2025] [::1]:48186 Closing
+[Mon Aug  4 09:14:38 2025] [::1]:48192 Accepted
+[Mon Aug  4 09:14:38 2025] [::1]:48192 [200]: GET /styles/touch.css
+[Mon Aug  4 09:14:38 2025] [::1]:48192 Closing
+[Mon Aug  4 09:14:38 2025] [::1]:48202 Accepted
+[Mon Aug  4 09:14:38 2025] [::1]:48202 [200]: GET /style.css
+[Mon Aug  4 09:14:38 2025] [::1]:48202 Closing
+[Mon Aug  4 09:14:38 2025] [::1]:48214 Accepted
+[Mon Aug  4 09:14:38 2025] [::1]:48214 [200]: GET /app.js
+[Mon Aug  4 09:14:38 2025] [::1]:48214 Closing
+[Mon Aug  4 09:14:38 2025] [::1]:48230 Accepted
+[Mon Aug  4 09:14:38 2025] [::1]:48230 Closing
+[Mon Aug  4 09:14:40 2025] [::1]:48242 Accepted
+[Mon Aug  4 09:14:40 2025] [::1]:48242 Closed without sending a request; it was probably just an unused speculative preconnection
+[Mon Aug  4 09:14:40 2025] [::1]:48242 Closing
+[Mon Aug  4 09:14:40 2025] [::1]:48246 Accepted
+[Mon Aug  4 09:14:40 2025] [::1]:48246 Closing
+[Mon Aug  4 09:14:40 2025] [::1]:48248 Accepted
+[Mon Aug  4 09:14:40 2025] [::1]:48248 [200]: GET /styles/variables.css
+[Mon Aug  4 09:14:40 2025] [::1]:48248 Closing
+[Mon Aug  4 09:14:40 2025] [::1]:48250 Accepted
+[Mon Aug  4 09:14:40 2025] [::1]:48250 [200]: GET /styles/base.css
+[Mon Aug  4 09:14:40 2025] [::1]:48250 Closing
+[Mon Aug  4 09:14:40 2025] [::1]:48258 Accepted
+[Mon Aug  4 09:14:40 2025] [::1]:48258 [200]: GET /styles/layout.css
+[Mon Aug  4 09:14:40 2025] [::1]:48274 Accepted
+[Mon Aug  4 09:14:40 2025] [::1]:48274 [200]: GET /styles/breakpoints.css
+[Mon Aug  4 09:14:40 2025] [::1]:48258 Closing
+[Mon Aug  4 09:14:40 2025] [::1]:48274 Closing
+[Mon Aug  4 09:14:40 2025] [::1]:48290 Accepted
+[Mon Aug  4 09:14:40 2025] [::1]:48290 [200]: GET /styles/utilities.css
+[Mon Aug  4 09:14:40 2025] [::1]:48306 Accepted
+[Mon Aug  4 09:14:40 2025] [::1]:48320 Accepted
+[Mon Aug  4 09:14:40 2025] [::1]:48306 [200]: GET /style.css
+[Mon Aug  4 09:14:40 2025] [::1]:48290 Closing
+[Mon Aug  4 09:14:40 2025] [::1]:48320 [200]: GET /styles/touch.css
+[Mon Aug  4 09:14:40 2025] [::1]:48306 Closing
+[Mon Aug  4 09:14:40 2025] [::1]:48320 Closing
+[Mon Aug  4 09:14:40 2025] [::1]:48322 Accepted
+[Mon Aug  4 09:14:40 2025] [::1]:48322 [200]: GET /app.js
+[Mon Aug  4 09:14:40 2025] [::1]:48322 Closing
+[Mon Aug  4 09:14:40 2025] [::1]:48324 Accepted
+[Mon Aug  4 09:14:40 2025] [::1]:48324 Closed without sending a request; it was probably just an unused speculative preconnection
+[Mon Aug  4 09:14:40 2025] [::1]:48324 Closing
+[Mon Aug  4 09:14:40 2025] [::1]:48326 Accepted
+[Mon Aug  4 09:14:40 2025] [::1]:48326 Closing
+[Mon Aug  4 09:14:40 2025] [::1]:48334 Accepted
+[Mon Aug  4 09:14:40 2025] [::1]:48334 Closing
+[Mon Aug  4 09:14:41 2025] [::1]:48342 Accepted
+[Mon Aug  4 09:14:41 2025] [::1]:48342 Closing
+[Mon Aug  4 09:14:41 2025] [::1]:48356 Accepted
+[Mon Aug  4 09:14:41 2025] [::1]:48356 [200]: GET /styles/variables.css
+[Mon Aug  4 09:14:41 2025] [::1]:48356 Closing
+[Mon Aug  4 09:14:41 2025] [::1]:48366 Accepted
+[Mon Aug  4 09:14:41 2025] [::1]:48366 [200]: GET /styles/base.css
+[Mon Aug  4 09:14:41 2025] [::1]:48374 Accepted
+[Mon Aug  4 09:14:41 2025] [::1]:48390 Accepted
+[Mon Aug  4 09:14:41 2025] [::1]:48366 Closing
+[Mon Aug  4 09:14:41 2025] [::1]:48374 [200]: GET /styles/layout.css
+[Mon Aug  4 09:14:41 2025] [::1]:48406 Accepted
+[Mon Aug  4 09:14:41 2025] [::1]:48374 Closing
+[Mon Aug  4 09:14:41 2025] [::1]:48390 [200]: GET /styles/touch.css
+[Mon Aug  4 09:14:41 2025] [::1]:48390 Closing
+[Mon Aug  4 09:14:41 2025] [::1]:48406 [200]: GET /style.css
+[Mon Aug  4 09:14:41 2025] [::1]:48406 Closing
+[Mon Aug  4 09:14:41 2025] [::1]:48414 Accepted
+[Mon Aug  4 09:14:41 2025] [::1]:48426 Accepted
+[Mon Aug  4 09:14:41 2025] [::1]:48442 Accepted
+[Mon Aug  4 09:14:41 2025] [::1]:48426 [200]: GET /app.js
+[Mon Aug  4 09:14:41 2025] [::1]:48414 [200]: GET /styles/breakpoints.css
+[Mon Aug  4 09:14:41 2025] [::1]:48442 [200]: GET /styles/utilities.css
+[Mon Aug  4 09:14:41 2025] [::1]:48426 Closing
+[Mon Aug  4 09:14:41 2025] [::1]:48414 Closing
+[Mon Aug  4 09:14:41 2025] [::1]:48442 Closing
+[Mon Aug  4 09:14:41 2025] [::1]:48446 Accepted
+[Mon Aug  4 09:14:41 2025] [::1]:48446 Closing
+[Mon Aug  4 09:14:52 2025] [::1]:45208 Accepted
+[Mon Aug  4 09:14:52 2025] [::1]:45208 Closing
