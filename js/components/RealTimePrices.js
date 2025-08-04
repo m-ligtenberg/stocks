@@ -3,13 +3,20 @@
  * Handles live price updates in the UI with smooth animations
  */
 class RealTimePrices {
-    constructor(realTimeService, notificationService) {
+    constructor(
+        realTimeService = window.lupoRealTime,
+        notificationService = window.lupoNotifications,
+        config = window.lupoConfig
+    ) {
         this.realTimeService = realTimeService;
         this.notificationService = notificationService;
+        this.config = config;
+        
         this.unsubscribe = null;
         this.priceElements = new Map();
         this.animationQueue = [];
         this.isAnimating = false;
+        this.performanceMode = this.config.get('ui.performanceMode', false);
         
         this.init();
     }

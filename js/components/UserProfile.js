@@ -1,12 +1,27 @@
 /**
  * User Profile Management Component
- * Handles user profile viewing, editing, and settings
+ * Handles user profile viewing, editing, and settings with standardized services
  */
 class UserProfile {
-    constructor(authService, notificationService) {
+    constructor(
+        authService = window.lupoAuth,
+        notificationService = window.lupoNotifications,
+        portfolioService = window.lupoPortfolio,
+        validationUtils = window.ValidationUtils,
+        storage = window.lupoStorage,
+        config = window.lupoConfig
+    ) {
         this.authService = authService;
         this.notificationService = notificationService;
+        this.portfolioService = portfolioService;
+        this.validationUtils = validationUtils;
+        this.storage = storage;
+        this.config = config;
+        
         this.currentUser = null;
+        this.profileCache = null;
+        this.cacheTimeout = this.config.get('profile.cacheTimeout', 300000); // 5 minutes
+        
         this.init();
     }
 
@@ -272,18 +287,37 @@ class UserProfile {
 
     async loadProfileStats() {
         try {
-            // This would fetch real stats from the API
-            const stats = {
-                totalTrades: 0,
-                portfolioValue: '$10,000.00',
-                totalPnL: '$0.00'
-            };
+            // Check cache first
+            if (this.profileCache && this.isCacheValid()) {
+                this.displayStats(this.profileCache.stats);
+                return;
+            }
 
-            document.getElementById('total-trades').textContent = stats.totalTrades;
-            document.getElementById('portfolio-value').textContent = stats.portfolioValue;
-            document.getElementById('total-pnl').textContent = stats.totalPnl;
+            // Fetch real stats from portfolio service
+            const portfolio = await this.portfolioService.getPortfolio();
+            const transactions = await this.portfolioService.getTransactionHistory(1, 100);
+            
+            const stats = {
+                totalTrades: transactions.data?.length || 0,
+                portfolioValue: `$${portfolio.total_value?.toLocaleString() || '0.00'}`,
+                totalPnL: this.calculateTotalPnL(portfolio)
+            };
+            
+            // Cache the stats
+            this.profileCache = {
+                stats,
+                timestamp: Date.now()
+            };
+            
+            this.displayStats(stats);
         } catch (error) {
             console.error('❌ Error loading profile stats:', error);
+            // Display fallback stats
+            this.displayStats({
+                totalTrades: '--',
+                portfolioValue: '--',
+                totalPnL: '--'
+            });
         }
     }
 
@@ -294,42 +328,62 @@ class UserProfile {
         const lastName = document.getElementById('last-name').value;
         const submitBtn = document.querySelector('#profile-form .btn-primary');
 
+        // Enhanced validation using ValidationUtils
+        const validation = this.validationUtils.validateForm(
+            { firstName, lastName },
+            {
+                firstName: ['string', { rule: 'maxLength', value: 50 }],
+                lastName: ['string', { rule: 'maxLength', value: 50 }]
+            }
+        );
+        
+        if (!validation.isValid) {
+            const errorMessage = Object.values(validation.errors)[0];
+            this.notificationService.warning('Validation Error', errorMessage);
+            return;
+        }
+
         // Show loading state
         submitBtn.disabled = true;
         const originalText = submitBtn.querySelector('.btn-text').textContent;
         submitBtn.querySelector('.btn-text').textContent = 'Updating...';
 
         try {
-            const response = await fetch('/api/user/profile', {
-                method: 'PUT',
-                headers: {
-                    'Authorization': `Bearer ${this.authService.getToken()}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    firstName,
-                    lastName
-                })
+            // Use standardized API client
+            const response = await this.authService.apiClient.put('/user/profile', {
+                firstName,
+                lastName
             });
-
-            const result = await response.json();
             
-            if (result.success) {
-                // Update local user data
+            if (response.isSuccess()) {
+                const updatedUser = response.getData();
+                
+                // Update local user data using auth service
                 this.currentUser = { ...this.currentUser, firstName, lastName };
-                localStorage.setItem('lupo-user', JSON.stringify(this.currentUser));
+                this.authService.setUser(this.currentUser);
                 
                 this.notificationService.success('Profile Updated', 'Your profile has been updated successfully');
                 this.updateUserDisplay();
                 
+                // Clear profile cache
+                this.clearProfileCache();
+                
+                // Dispatch profile update event
+                this.dispatchProfileEvent('profile:updated', this.currentUser);
+                
                 // Close modal
                 document.getElementById('profile-modal').remove();
             } else {
-                this.notificationService.error('Update Failed', result.error || 'Failed to update profile');
+                throw new Error(response.getError());
             }
         } catch (error) {
             console.error('❌ Profile update error:', error);
-            this.notificationService.error('Update Failed', 'Network error - please try again');
+            
+            if (error.name === 'ValidationError') {
+                this.notificationService.warning('Validation Error', error.message);
+            } else {
+                this.notificationService.error('Update Failed', 'Failed to update profile - please try again');
+            }
         } finally {
             // Reset button state
             if (submitBtn) {
@@ -358,16 +412,152 @@ class UserProfile {
     }
 
     handleLogout() {
-        // Confirm logout
-        const confirmLogout = confirm('Are you sure you want to sign out?');
-        if (confirmLogout) {
-            this.authService.logout();
-            location.reload();
-        }
+        // Enhanced logout confirmation with better styling
+        this.showLogoutConfirmation();
     }
 
     getJoinDate() {
-        // This would come from user data
+        if (this.currentUser?.created_at) {
+            return new Date(this.currentUser.created_at).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long'
+            });
+        }
         return 'January 2024';
+    }
+
+    /**
+     * Display profile statistics
+     */
+    displayStats(stats) {
+        const elements = {
+            'total-trades': stats.totalTrades,
+            'portfolio-value': stats.portfolioValue,
+            'total-pnl': stats.totalPnL
+        };
+
+        Object.entries(elements).forEach(([id, value]) => {
+            const element = document.getElementById(id);
+            if (element) {
+                element.textContent = value;
+            }
+        });
+    }
+
+    /**
+     * Calculate total P&L from portfolio
+     */
+    calculateTotalPnL(portfolio) {
+        if (!portfolio.metrics) {
+            return '$0.00';
+        }
+
+        const pnl = portfolio.metrics.totalGainLoss || 0;
+        const prefix = pnl >= 0 ? '+' : '';
+        const color = pnl >= 0 ? 'var(--color-retail-positive)' : 'var(--color-retail-negative)';
+        
+        return `${prefix}$${Math.abs(pnl).toLocaleString()}`;
+    }
+
+    /**
+     * Check if profile cache is valid
+     */
+    isCacheValid() {
+        if (!this.profileCache) return false;
+        return (Date.now() - this.profileCache.timestamp) < this.cacheTimeout;
+    }
+
+    /**
+     * Clear profile cache
+     */
+    clearProfileCache() {
+        this.profileCache = null;
+    }
+
+    /**
+     * Dispatch profile events
+     */
+    dispatchProfileEvent(type, data) {
+        const event = new CustomEvent(type, {
+            detail: { data, timestamp: Date.now() }
+        });
+        window.dispatchEvent(event);
+    }
+
+    /**
+     * Enhanced logout confirmation
+     */
+    showLogoutConfirmation() {
+        const confirmationHTML = `
+            <div id="logout-confirmation" class="modal">
+                <div class="modal-overlay"></div>
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2>Confirm Sign Out</h2>
+                    </div>
+                    <div class="modal-body">
+                        <p>Are you sure you want to sign out of your account?</p>
+                        <div class="form-actions">
+                            <button id="confirm-logout" class="btn btn-primary">Sign Out</button>
+                            <button id="cancel-logout" class="btn btn-secondary">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        document.body.insertAdjacentHTML('beforeend', confirmationHTML);
+        
+        // Setup event listeners
+        document.getElementById('confirm-logout').addEventListener('click', () => {
+            this.executeLogout();
+        });
+        
+        document.getElementById('cancel-logout').addEventListener('click', () => {
+            document.getElementById('logout-confirmation').remove();
+        });
+        
+        // Close on overlay click
+        document.querySelector('#logout-confirmation .modal-overlay').addEventListener('click', () => {
+            document.getElementById('logout-confirmation').remove();
+        });
+    }
+    
+    executeLogout() {
+        try {
+            // Clear any cached data
+            this.clearProfileCache();
+            
+            // Use auth service logout
+            this.authService.logout();
+            
+            // Clean up component state
+            this.currentUser = null;
+            
+            // Dispatch logout event
+            this.dispatchProfileEvent('profile:logout', null);
+            
+            // Remove confirmation modal
+            const confirmation = document.getElementById('logout-confirmation');
+            if (confirmation) confirmation.remove();
+            
+            // Reload page
+            location.reload();
+        } catch (error) {
+            console.error('❌ Logout error:', error);
+            this.notificationService.error('Logout Failed', 'Error signing out - please try again');
+        }
+    }
+
+    /**
+     * Get component statistics
+     */
+    getStats() {
+        return {
+            currentUser: this.currentUser?.email || null,
+            cacheValid: this.isCacheValid(),
+            cacheTimeout: this.cacheTimeout,
+            profileCacheSize: this.profileCache ? Object.keys(this.profileCache).length : 0
+        };
     }
 }

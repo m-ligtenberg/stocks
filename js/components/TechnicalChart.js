@@ -3,16 +3,24 @@
  * Advanced charting with multiple timeframes and technical indicators
  */
 class TechnicalChart {
-    constructor(stockService, realTimeService, notificationService) {
+    constructor(
+        stockService = window.lupoStocks,
+        realTimeService = window.lupoRealTime,
+        notificationService = window.lupoNotifications,
+        config = window.lupoConfig
+    ) {
         this.stockService = stockService;
         this.realTimeService = realTimeService;
         this.notificationService = notificationService;
+        this.config = config;
+        
         this.chart = null;
         this.currentSymbol = null;
         this.currentTimeframe = '1D';
         this.indicators = new Map();
         this.chartData = [];
         this.realTimeSubscription = null;
+        this.performanceMode = this.config.get('charts.performanceMode', false);
         
         this.init();
     }

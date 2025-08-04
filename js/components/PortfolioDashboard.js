@@ -3,18 +3,68 @@
  * Professional portfolio visualization with charts, holdings, and performance metrics
  */
 class PortfolioDashboard {
-    constructor(portfolioService, notificationService) {
+    constructor(
+        portfolioService = window.lupoPortfolio,
+        notificationService = window.lupoNotifications,
+        realTimeService = window.lupoRealTime,
+        config = window.lupoConfig
+    ) {
         this.portfolioService = portfolioService;
         this.notificationService = notificationService;
+        this.realTimeService = realTimeService;
+        this.config = config;
+        
         this.portfolio = null;
         this.portfolioChart = null;
         this.performanceChart = null;
+        this.updateInterval = null;
+        this.realTimeSubscription = null;
+        
         this.init();
     }
 
     init() {
+        console.log('📊 Initializing Portfolio Dashboard...');
         this.setupEventListeners();
+        this.setupRealTimeUpdates();
         this.loadPortfolioData();
+    }
+
+    setupRealTimeUpdates() {
+        // Subscribe to real-time price updates for portfolio holdings
+        this.realTimeSubscription = this.realTimeService.subscribe(
+            'portfolio-dashboard',
+            (event, data) => this.handleRealTimeUpdate(event, data),
+            []
+        );
+    }
+
+    handleRealTimeUpdate(event, data) {
+        if (event === 'priceUpdate' && this.portfolio) {
+            // Update portfolio holdings with new prices
+            this.updateHoldingPrices(data);
+        }
+    }
+
+    updateHoldingPrices(priceData) {
+        if (!this.portfolio?.holdings) return;
+
+        const holding = this.portfolio.holdings.find(h => h.symbol === priceData.symbol);
+        if (holding) {
+            holding.currentPrice = priceData.price;
+            
+            // Recalculate metrics
+            this.portfolio.metrics = this.portfolioService.calculatePortfolioMetrics(this.portfolio);
+            
+            // Update display
+            this.renderPortfolioSummary();
+            this.renderPortfolioHoldings();
+            
+            // Update chart if needed
+            if (this.portfolioChart) {
+                this.updatePortfolioChart();
+            }
+        }
     }
 
     setupEventListeners() {
@@ -355,18 +405,49 @@ class PortfolioDashboard {
         }
     }
 
+    updatePortfolioChart() {
+        if (!this.portfolioChart || !this.portfolio?.holdings) return;
+
+        const data = this.portfolio.holdings.map(holding => ({
+            symbol: holding.symbol,
+            value: holding.shares * holding.currentPrice
+        }));
+
+        // Update chart data
+        this.portfolioChart.data.datasets[0].data = data.map(d => d.value);
+        this.portfolioChart.update('none');
+    }
+
     // Public method to refresh data
     async refresh() {
         await this.loadPortfolioData();
     }
 
+    // Get component statistics
+    getStats() {
+        return {
+            portfolioLoaded: !!this.portfolio,
+            holdingsCount: this.portfolio?.holdings?.length || 0,
+            chartActive: !!this.portfolioChart,
+            realTimeSubscribed: !!this.realTimeSubscription
+        };
+    }
+
     // Cleanup method
     destroy() {
+        console.log('📊 Destroying Portfolio Dashboard...');
+        
         if (this.portfolioChart) {
             this.portfolioChart.destroy();
         }
         if (this.performanceChart) {
             this.performanceChart.destroy();
+        }
+        if (this.updateInterval) {
+            clearInterval(this.updateInterval);
+        }
+        if (this.realTimeSubscription) {
+            this.realTimeSubscription();
         }
     }
 }
