@@ -20,16 +20,22 @@
     <script src="js/services/ConfigService.js"></script>
     <script src="js/services/StorageService.js"></script>
     
+    <!-- Centralized State Management -->
+    <script src="js/utils/ApplicationStateManager.js"></script>
+    <script src="js/services/StateSyncService.js"></script>
+    
     <!-- Modular JavaScript Services -->
     <script src="js/services/AuthService.js"></script>
     <script src="js/services/StockService.js"></script>
     <script src="js/services/PortfolioService.js"></script>
     <script src="js/utils/NotificationService.js"></script>
+    <script src="js/services/RealTimeService.js"></script>
+    
+    <!-- UI Components -->
     <script src="js/components/TradeModal.js"></script>
     <script src="js/components/PasswordReset.js"></script>
     <script src="js/components/UserProfile.js"></script>
     <script src="js/components/PortfolioDashboard.js"></script>
-    <script src="js/services/RealTimeService.js"></script>
     <script src="js/components/RealTimePrices.js"></script>
     <script src="js/components/TechnicalChart.js"></script>
 </head>
@@ -514,6 +520,7 @@
     </div>
 
 
-    <script src="js/app.js"></script>
+    <!-- Application Manager (Load Last) -->
+    <script src="js/AppManager.js"></script>
 </body>
 </html>
